@@ -34,7 +34,8 @@
                 </Fallback>
             </RetryUntilSuccessful>
             <Sequence name="FinJuego">
-                <Action ID="Navegar" goal=""/>
+                <Action ID="GetWP" WayPoint="{origin}"/>
+                <Action ID="Navegar" goal="{origin}"/>
                 <Action ID="Speak"/>
             </Sequence>
         </Sequence>
