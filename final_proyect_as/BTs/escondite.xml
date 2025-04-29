@@ -16,9 +16,9 @@
                     <Condition ID="Finish"/>
                     <ForceFailure>
                         <Sequence name="Partida">
-                            <Action ID="SetWP"/>
+                            <Action ID="GetWP" WayPoint="{wp}"/>
                             <RetryUntilSuccessful num_attempts="10">
-                                <Action ID="Navegar"/>
+                                <Action ID="Navegar" goal="{wp}"/>
                             </RetryUntilSuccessful>
                             <ForceSuccess>
                                 <Sequence name="Comprobar">
@@ -34,7 +34,7 @@
                 </Fallback>
             </RetryUntilSuccessful>
             <Sequence name="FinJuego">
-                <Action ID="Navegar"/>
+                <Action ID="Navegar" goal=""/>
                 <Action ID="Speak"/>
             </Sequence>
         </Sequence>
@@ -47,17 +47,24 @@
             <input_port name="prompt"/>
         </Action>
         <Condition ID="Finish"/>
+        <Action ID="GetWP">
+            <output_port name="WayPoint"/>
+        </Action>
         <Condition ID="IsPerson"/>
         <Action ID="Listen">
             <output_port name="listen_text"/>
         </Action>
-        <Action ID="Navegar"/>
+        <Action ID="Move">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="Navegar">
+            <input_port name="goal"/>
+        </Action>
         <Action ID="Query">
             <input_port name="Intention"/>
             <output_port name="intention_value"/>
             <input_port name="text"/>
         </Action>
-        <Action ID="SetWP"/>
         <Action ID="Speak"/>
         <Action ID="speak">
             <input_port name="say_text"/>
