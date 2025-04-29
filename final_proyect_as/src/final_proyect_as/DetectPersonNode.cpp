@@ -23,9 +23,13 @@
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "rclcpp/macros.hpp"
 
-#include "geometry_msgs/msg/twist.hpp"
+#include "yolo_msgs/msg/detection_array.hpp"
+
+#include "vision_msgs/msg/detection2_d_array.hpp"
+#include "vision_msgs/msg/detection2_d.hpp"
+#include "vision_msgs/msg/object_hypothesis_with_pose.hpp"
+
 #include "rclcpp/rclcpp.hpp"
-#include "vision_msgs/msg/detection3_d_array.hpp"
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
@@ -53,8 +57,21 @@ DetectPersonNode::on_activate(const rclcpp_lifecycle::State & previous_state)
   (void)previous_state;
   RCLCPP_INFO(get_logger(), "Activating...");
 
-  array3D_sub_ = create_subscription<vision_msgs::msg::Detection3DArray>(
-    "detection_3d", 10, std::bind(&DetectPersonNode::array3D_callback, this, _1));
+  id_list_.clear();
+
+  detection_sub_ = create_subscription<yolo_msgs::msg::DetectionArray>(
+    "input_detection", rclcpp::SensorDataQoS().reliable(),
+    std::bind(&DetectPersonNode::detection_callback, this, _1));
+
+  timer_ = create_wall_timer(5s, [this]() {
+
+    int persons = id_list_.size();
+    RCLCPP_INFO(get_logger(), "Número de personas detectadas: %d", persons);
+    
+    blackboard()->set("num_persons", persons);
+    // int num_persons = blackboard()->get<int>("num_personas");
+    this->deactivate();
+  });
 
   return CallbackReturn::SUCCESS;
 }
@@ -64,6 +81,8 @@ DetectPersonNode::on_deactivate(const rclcpp_lifecycle::State & previous_state)
 {
   (void)previous_state;
   RCLCPP_INFO(get_logger(), "Deactivating...");
+
+  timer_->cancel();
 
   return CallbackReturn::SUCCESS;
 }
@@ -96,17 +115,17 @@ DetectPersonNode::on_error(const rclcpp_lifecycle::State & previous_state)
 }
 
 void
-DetectPersonNode::array3D_callback(vision_msgs::msg::Detection3DArray::UniquePtr detectionArray)
+DetectPersonNode::detection_callback(
+  const yolo_msgs::msg::DetectionArray::ConstSharedPtr & msg)
 {
-  std::vector<std::string> id_list;
 
-  for(const auto& detection : detectionArray->detections){
-    if(detection.results[0].hypothesis.class_id == "person"){
-      std::string id = "0";//detection.results[0].hypothesis.id;
+  for(const auto & detection : msg->detections){
+    if(detection.class_name == "person"){
+      int id = detection.class_id;
 
       bool ya_existe = false;
 
-      for (const auto& existente : id_list) {
+      for (const auto& existente : id_list_) {
         if (id == existente) {
           ya_existe = true;
           break;
@@ -114,23 +133,10 @@ DetectPersonNode::array3D_callback(vision_msgs::msg::Detection3DArray::UniquePtr
       }
 
       if (!ya_existe) {
-        id_list.push_back(id);
+        id_list_.push_back(id);
+        RCLCPP_INFO(get_logger(), "ID %d", id);
       }
-    }   
-  }
-
-  int persons = id_list.size();
-
-  if (persons == 0){
-    RCLCPP_INFO(get_logger(), "No hay personas en este escondite");
-
-  } else{
-    RCLCPP_INFO(get_logger(), "Número de personas encontradas: %d\n", persons);
-
-    for (int i = 0; i < persons; i++) {
-      RCLCPP_INFO(get_logger(), "ID %d: %s", i, id_list[i].c_str());
     }
-
   }
 }
 }

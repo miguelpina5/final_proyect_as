@@ -19,8 +19,6 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
 
   auto node = detectperson::DetectPersonNode::make_shared();
-  node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_CONFIGURE);
-  node->trigger_transition(lifecycle_msgs::msg::Transition::TRANSITION_ACTIVATE);
 
   rclcpp::spin(node->get_node_base_interface());
 

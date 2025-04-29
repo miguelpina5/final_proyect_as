@@ -19,9 +19,10 @@
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "rclcpp/macros.hpp"
 
-#include "geometry_msgs/msg/twist.hpp"
+#include "yolo_msgs/msg/detection_array.hpp"
+#include "vision_msgs/msg/detection2_d_array.hpp"
+
 #include "rclcpp/rclcpp.hpp"
-#include "vision_msgs/msg/detection3_d_array.hpp"
 
 using namespace std::chrono_literals;
 
@@ -36,7 +37,7 @@ public:
   using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
 
   DetectPersonNode();
-  void array3D_callback(vision_msgs::msg::Detection3DArray::UniquePtr msg);
+  void detection_callback(const yolo_msgs::msg::DetectionArray::ConstSharedPtr & msg);
 
   CallbackReturn on_configure(const rclcpp_lifecycle::State & previous_state);
   CallbackReturn on_activate(const rclcpp_lifecycle::State & previous_state);
@@ -48,7 +49,9 @@ public:
 
 private:
 
-  rclcpp::Subscription<vision_msgs::msg::Detection3DArray>::SharedPtr array3D_sub_;
+  rclcpp::Subscription<yolo_msgs::msg::DetectionArray>::SharedPtr detection_sub_;
+  std::vector<int> id_list_;
+  rclcpp::TimerBase::SharedPtr timer_;
 
 };
 
