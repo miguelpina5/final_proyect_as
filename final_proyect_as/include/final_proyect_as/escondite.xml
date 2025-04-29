@@ -11,24 +11,28 @@
                     <Action ID="DialogConfirmation" prompt="¿Has dicho {num_jugadores}?"/>
                 </Sequence>
             </RetryUntilSuccessful>
-            <Fallback name="Jugar">
-                <Condition ID="Finish"/>
-                <Sequence name="Partida">
-                    <Action ID="SetWP"/>
-                    <RetryUntilSuccessful num_attempts="10">
-                        <Action ID="Navegar"/>
-                    </RetryUntilSuccessful>
-                    <ForceSuccess>
-                        <Sequence name="Comprobar">
-                            <Condition ID="IsPerson"/>
-                            <Action ID="speak" say_text="¿Cuál es tu nombre?"/>
-                            <Action ID="Listen" listen_text="{understood}"/>
-                            <Action ID="Query" Intention="nombre" intention_value="{name_jugador}" text="{understood}"/>
-                            <Action ID="DialogConfirmation" prompt="¿Eres {name_jugador}"/>
+            <RetryUntilSuccessful num_attempts="6">
+                <Fallback name="Jugar">
+                    <Condition ID="Finish"/>
+                    <ForceFailure>
+                        <Sequence name="Partida">
+                            <Action ID="SetWP"/>
+                            <RetryUntilSuccessful num_attempts="10">
+                                <Action ID="Navegar"/>
+                            </RetryUntilSuccessful>
+                            <ForceSuccess>
+                                <Sequence name="Comprobar">
+                                    <Condition ID="IsPerson"/>
+                                    <Action ID="speak" say_text="¿Cuál es tu nombre?"/>
+                                    <Action ID="Listen" listen_text="{understood}"/>
+                                    <Action ID="Query" Intention="nombre" intention_value="{name_jugador}" text="{understood}"/>
+                                    <Action ID="DialogConfirmation" prompt="¿Eres {name_jugador}"/>
+                                </Sequence>
+                            </ForceSuccess>
                         </Sequence>
-                    </ForceSuccess>
-                </Sequence>
-            </Fallback>
+                    </ForceFailure>
+                </Fallback>
+            </RetryUntilSuccessful>
             <Sequence name="FinJuego">
                 <Action ID="Navegar"/>
                 <Action ID="Speak"/>
