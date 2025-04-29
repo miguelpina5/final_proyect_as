@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence name="Control">
+            <RetryUntilSuccessful num_attempts="10">
+                <Sequence name="Configuración">
+                    <Action ID="speak" say_text="¿Cuántos jugadores sois?"/>
+                    <Action ID="Listen" listen_text="{understood}"/>
+                    <Action ID="Query" Intention="Jugadores" intention_value="{num_jugadores}" text="[understood}"/>
+                    <Action ID="DialogConfirmation" prompt="¿Has dicho {num_jugadores}?"/>
+                </Sequence>
+            </RetryUntilSuccessful>
+            <Fallback name="Jugar">
+                <Condition ID="Finish"/>
+                <Sequence name="Partida">
+                    <Action ID="SetWP"/>
+                    <RetryUntilSuccessful num_attempts="10">
+                        <Action ID="Navegar"/>
+                    </RetryUntilSuccessful>
+                    <ForceSuccess>
+                        <Sequence name="Comprobar">
+                            <Condition ID="IsPerson"/>
+                            <Action ID="speak" say_text="¿Cuál es tu nombre?"/>
+                            <Action ID="Listen" listen_text="{understood}"/>
+                            <Action ID="Query" Intention="nombre" intention_value="{name_jugador}" text="{understood}"/>
+                            <Action ID="DialogConfirmation" prompt="¿Eres {name_jugador}"/>
+                        </Sequence>
+                    </ForceSuccess>
+                </Sequence>
+            </Fallback>
+            <Sequence name="FinJuego">
+                <Action ID="Navegar"/>
+                <Action ID="Speak"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="AñadirPerson"/>
+        <Action ID="Configuración"/>
+        <Action ID="DialogConfirmation">
+            <input_port name="prompt"/>
+        </Action>
+        <Condition ID="Finish"/>
+        <Condition ID="IsPerson"/>
+        <Action ID="Listen">
+            <output_port name="listen_text"/>
+        </Action>
+        <Action ID="Navegar"/>
+        <Action ID="Query">
+            <input_port name="Intention"/>
+            <output_port name="intention_value"/>
+            <input_port name="text"/>
+        </Action>
+        <Action ID="SetWP"/>
+        <Action ID="Speak"/>
+        <Action ID="speak">
+            <input_port name="say_text"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
