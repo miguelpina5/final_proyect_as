@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>final_proyect_as</name>
+  <name>bt_yolo</name>
   <version>0.0.1</version>
   <description>Third practice</description>
   <maintainer email="ma.pina.2023@alumnos.urjc.es">miguelpina5</maintainer>
@@ -17,7 +17,6 @@
   <depend>std_msgs</depend>
   <depend>vision_msgs</depend>
   <depend>yolo_msgs</depend>
-
 
   <exec_depend>camera</exec_depend>
   <exec_depend>laser</exec_depend>

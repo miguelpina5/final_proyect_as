@@ -34,7 +34,7 @@ def generate_launch_description():
                         ])
 
     final_proyect_as = Node(
-                    package='final_proyect_as',
+                    package='bt_yolo',
                     executable='detectPerson',
                     output='screen'
                     )

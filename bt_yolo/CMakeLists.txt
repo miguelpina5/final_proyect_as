@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(final_proyect_as)
+project(bt_yolo)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -30,7 +30,7 @@ set(dependencies
 include_directories(include)
 
 add_library(${PROJECT_NAME} SHARED
-  src/final_proyect_as/DetectPersonNode.cpp
+  src/bt_yolo/DetectPersonNode.cpp
 )
 ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 
