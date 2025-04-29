@@ -4,13 +4,11 @@
     <BehaviorTree ID="BehaviorTree">
         <Sequence name="Control">
             <RetryUntilSuccessful num_attempts="10">
-                <Sequence name="Configuración">
-                    <Action ID="Num_jugadores" jugadores="{num}"/>
-                </Sequence>
+                <Action ID="RequestPlayersNode" encontrados="0" players="{num}"/>
             </RetryUntilSuccessful>
             <RetryUntilSuccessful num_attempts="6">
                 <Fallback name="Jugar">
-                    <Condition ID="Finish"/>
+                    <Condition ID="FinishNode" encontrados="{encontrados}" players="{num"/>
                     <ForceFailure>
                         <Sequence name="Partida">
                             <Action ID="GetWP" WayPoint="{wp}"/>
@@ -18,7 +16,7 @@
                                 <Action ID="Navegar" goal="{wp}"/>
                             </RetryUntilSuccessful>
                             <ForceSuccess>
-                                <Condition ID="IsPerson"/>
+                                <Action ID="DetectPersonNode" encontrados="{encontrados}"/>
                             </ForceSuccess>
                         </Sequence>
                     </ForceFailure>
@@ -34,10 +32,17 @@
     <TreeNodesModel>
         <Action ID="AñadirPerson"/>
         <Action ID="Configuración"/>
+        <Action ID="DetectPersonNode">
+            <output_port name="encontrados"/>
+        </Action>
         <Action ID="DialogConfirmation">
             <input_port name="prompt"/>
         </Action>
         <Condition ID="Finish"/>
+        <Condition ID="FinishNode">
+            <input_port name="encontrados"/>
+            <input_port name="players"/>
+        </Condition>
         <Action ID="GetWP">
             <output_port name="WayPoint"/>
         </Action>
@@ -58,6 +63,10 @@
             <input_port name="Intention"/>
             <output_port name="intention_value"/>
             <input_port name="text"/>
+        </Action>
+        <Action ID="RequestPlayersNode">
+            <output_port default="0" name="encontrados"/>
+            <input_port name="players"/>
         </Action>
         <Action ID="Speak"/>
         <Action ID="speak">
