@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <chrono>
 #include "bt_nav/Move.hpp"
 
 namespace bt_nav
@@ -23,6 +24,8 @@ Move::Move(
   const BT::NodeConfiguration & conf)
 : bt_nav::BtActionNode<nav2_msgs::action::NavigateToPose>(xml_tag_name, action_name, conf)
 {
+  // Ampliamos el timeout a 5 segundos para que send_goal tenga tiempo suficiente
+  this->server_timeout_ = std::chrono::seconds(5);
 }
 
 void
@@ -38,10 +41,8 @@ BT::NodeStatus
 Move::on_success()
 {
   RCLCPP_INFO(node_->get_logger(), "** NAVIGATION SUCCEEDED **");
-
   return BT::NodeStatus::SUCCESS;
 }
-
 
 }  // namespace bt_nav
 
@@ -51,7 +52,7 @@ BT_REGISTER_NODES(factory)
     [](const std::string & name, const BT::NodeConfiguration & config)
     {
       return std::make_unique<bt_nav::Move>(
-        name, "navigate_to_pose", config);
+        name, "/navigate_to_pose", config);
     };
 
   factory.registerBuilder<bt_nav::Move>(

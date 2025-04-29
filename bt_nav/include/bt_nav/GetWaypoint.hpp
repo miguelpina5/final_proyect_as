@@ -1,26 +1,15 @@
-// Copyright 2021 Intelligent Robotics Lab
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+// src/bt_nav/GetWaypoint.hpp
 
 #ifndef BT_NAV__GETWAYPOINT_HPP_
 #define BT_NAV__GETWAYPOINT_HPP_
 
 #include <string>
+#include <vector>
+#include <random>
 
-#include "behaviortree_cpp_v3/behavior_tree.h"
-#include "behaviortree_cpp_v3/bt_factory.h"
-
+#include "behaviortree_cpp_v3/action_node.h"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace bt_nav
 {
@@ -28,23 +17,22 @@ namespace bt_nav
 class GetWaypoint : public BT::ActionNodeBase
 {
 public:
-  explicit GetWaypoint(
+  GetWaypoint(
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
 
-  void halt();
-  BT::NodeStatus tick();
+  void halt() override;
+  BT::NodeStatus tick() override;
 
   static BT::PortsList providedPorts()
   {
-    return BT::PortsList(
-      {
-        BT::OutputPort<geometry_msgs::msg::PoseStamped>("waypoint")
-      });
+    return { BT::OutputPort<geometry_msgs::msg::PoseStamped>("waypoint") };
   }
 
 private:
-  geometry_msgs::msg::PoseStamped wp_;
+  std::vector<geometry_msgs::msg::PoseStamped> waypoints_;
+  std::mt19937 gen_;
+  std::uniform_int_distribution<size_t> dist_;
 };
 
 }  // namespace bt_nav

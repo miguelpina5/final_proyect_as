@@ -47,11 +47,12 @@ int main(int argc, char * argv[])
 
   bool finish = false;
   while (!finish && rclcpp::ok()) {
-    finish = tree.rootNode()->executeTick() != BT::NodeStatus::RUNNING;
-
-    rclcpp::spin_some(node);
-    rate.sleep();
-  }
+       // Primero atiendo callbacks (descubro el servidor, catcheo confirmaciones…)
+       rclcpp::spin_some(node);
+       // Ahora ejecuto el tick, que enviará correctamente el goal
+       finish = tree.rootNode()->executeTick() != BT::NodeStatus::RUNNING;
+       rate.sleep();
+ }
 
   rclcpp::shutdown();
   return 0;
