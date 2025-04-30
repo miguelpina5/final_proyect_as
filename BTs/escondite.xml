@@ -11,7 +11,7 @@
                     <Action ID="DialogConfirmation" prompt="¿Has dicho {num_jugadores}?"/>
                 </Sequence>
             </RetryUntilSuccessful>
-            <RetryUntilSuccessful num_attempts="6">
+            <RetryUntilSuccessful num_attempts="{num_jugadores} + 1">
                 <Fallback name="Jugar">
                     <Condition ID="Finish"/>
                     <ForceFailure>
