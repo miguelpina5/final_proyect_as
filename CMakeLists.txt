@@ -31,8 +31,8 @@ set(dependencies
 
 include_directories(include ${ZMQ_INCLUDE_DIRS})
 
-add_library(move_bt_node SHARED src/bt_nav/Move.cpp)
-add_library(getwp_bt_node SHARED src/bt_nav/GetWaypoint.cpp)
+add_library(move_bt_node SHARED src/final_proyect_as/Move.cpp)
+add_library(getwp_bt_node SHARED src/final_proyect_as/GetWaypoint.cpp)
 add_library(detectPerson_bt_node SHARED src/final_proyect_as/DetectPersonNode.cpp)
 add_library(finish_bt_node SHARED src/final_proyect_as/FinishNode.cpp)
 add_library(requestPlayer_bt_node SHARED src/final_proyect_as/RequestPlayersNode.cpp)
@@ -53,9 +53,13 @@ endforeach()
 add_executable(final_proyect src/main_bt.cpp)
 ament_target_dependencies(final_proyect ${dependencies})
 
+add_executable(bt_nav src/bt_nav_main.cpp)
+ament_target_dependencies(bt_nav ${dependencies})
+
 install(TARGETS
   ${plugin_libs}
   final_proyect
+  bt_nav
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

@@ -32,15 +32,6 @@ int main(int argc, char * argv[])
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("patrolling_node");
 
-  // Pedimos el número de jugadores
-  int n_jugadores = 0;
-  std::cout << "Introduce el número de jugadores (1-5): ";
-  std::cin  >> n_jugadores;
-  if (n_jugadores < 1 || n_jugadores > 5) {
-    RCLCPP_ERROR(node->get_logger(), "Número de jugadores fuera de rango [1-5]");
-    return 1;
-  }
-
   // Definimos lista completa de coordenadas
   std::vector<std::pair<double,double>> coords = {
     {0.53, 14.73}, {5.53, 18.79}, {17.02, 28.56},
