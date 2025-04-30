@@ -1,12 +1,9 @@
 #ifndef BT_NAV__GETWAYPOINT_HPP_
 #define BT_NAV__GETWAYPOINT_HPP_
 
-#include <string>
-#include <memory>
-
 #include "behaviortree_cpp_v3/action_node.h"
-#include "rclcpp/rclcpp.hpp"
-#include "geometry_msgs/msg/pose_stamped.hpp"
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <vector>
 
 namespace bt_nav
 {
@@ -14,26 +11,28 @@ namespace bt_nav
 class GetWaypoint : public BT::ActionNodeBase
 {
 public:
-  GetWaypoint(
-    const std::string & xml_tag_name,
-    const BT::NodeConfiguration & conf);
+  GetWaypoint(const std::string& name, const BT::NodeConfiguration& config);
 
-  // No interrumpible
-  void halt() override;
-
-  // Ejecución principal
-  BT::NodeStatus tick() override;
-
-  // Definición de puertos
+  // Registra puertos: recibe número de jugadores y lista de waypoints; devuelve un waypoint
   static BT::PortsList providedPorts()
   {
     return {
-      BT::InputPort<geometry_msgs::msg::PoseStamped>("waypoint", "Waypoint de entrada para mapear y publicar"),
-      BT::OutputPort<geometry_msgs::msg::PoseStamped>("waypoint", "Waypoint modificado con frame y timestamp ajustados")
+      BT::InputPort<int>("players", "Número de jugadores"),
+      BT::InputPort<std::vector<geometry_msgs::msg::PoseStamped>>("waypoints", "Lista de waypoints"),
+      BT::OutputPort<geometry_msgs::msg::PoseStamped>("waypoint", "Waypoint seleccionado")
     };
   }
 
+  // Sobrescribe tick y halt
+  BT::NodeStatus tick() override;
+  void halt() override {}
+
 private:
+  bool initialized_{false};
+  int call_count_{0};
+  int max_calls_{0};
+  std::vector<geometry_msgs::msg::PoseStamped> waypoints_;
+  std::vector<bool> visited_;
   rclcpp::Node::SharedPtr node_;
 };
 
