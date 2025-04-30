@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>bt_yolo</name>
+  <name>final_proyect_as</name>
   <version>0.0.1</version>
   <description>Third practice</description>
   <maintainer email="ma.pina.2023@alumnos.urjc.es">miguelpina5</maintainer>
@@ -11,21 +11,20 @@
 
   <depend>rclcpp</depend>
   <depend>geometry_msgs</depend>
-  <depend>tf2_geometry_msgs</depend>
-  <depend>tf2</depend>
-  <depend>tf2_ros</depend>
   <depend>std_msgs</depend>
   <depend>vision_msgs</depend>
   <depend>yolo_msgs</depend>
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>ament_index_cpp</depend>
+  <depend>nav2_msgs</depend>
+  <depend>rclcpp_action</depend>
 
   <exec_depend>camera</exec_depend>
-  <exec_depend>laser</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
-  
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
-  
 </package>

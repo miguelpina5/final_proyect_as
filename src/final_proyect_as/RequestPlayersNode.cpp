@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <memory>
+#include <iostream>
+
 #include "final_proyect_as/RequestPlayersNode.hpp"
 
-#include <iostream>
+#include "rclcpp/node.hpp"
+#include "rclcpp/macros.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace requestPlayers
 {

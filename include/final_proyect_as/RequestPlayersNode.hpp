@@ -15,7 +15,14 @@
 #ifndef REQUESTPLAYERSNODE_HPP_
 #define REQUESTPLAYERSNODE_HPP_
 
+#include <memory>
+#include <iostream>
+
 #include "behaviortree_cpp_v3/action_node.h"
+
+#include "rclcpp/node.hpp"
+#include "rclcpp/macros.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace requestPlayers
 {

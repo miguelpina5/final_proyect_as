@@ -36,7 +36,7 @@ using std::placeholders::_1;
 namespace detectperson
 {
 
-DetectPersonBTNode::DetectPersonBTNode(
+  DetectPersonNode::DetectPersonNode(
   const std::string & name,
   const BT::NodeConfiguration & config)
 : BT::SyncActionNode(name, config),
@@ -61,7 +61,7 @@ DetectPersonBTNode::DetectPersonBTNode(
 }
 
 BT::NodeStatus
-DetectPersonBTNode::tick()
+DetectPersonNode::tick()
 {
   person_detected_ = false;
 

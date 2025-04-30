@@ -15,7 +15,14 @@
 #ifndef FINISHNODE_HPP_
 #define FINISHNODE_HPP_
 
+#include <memory>
+#include <iostream>
+
 #include "behaviortree_cpp_v3/condition_node.h"
+
+#include "rclcpp/node.hpp"
+#include "rclcpp/macros.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace finish
 {

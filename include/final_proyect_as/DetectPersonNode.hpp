@@ -16,12 +16,16 @@
 #define DETECTPERSONNODE_HPP_
 
 #include <memory>
+#include <iostream>
+
 #include "rclcpp/node.hpp"
 #include "rclcpp/macros.hpp"
 
 #include "yolo_msgs/msg/detection_array.hpp"
 #include "vision_msgs/msg/detection2_d_array.hpp"
 
+#include "rclcpp/node.hpp"
+#include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 #include "behaviortree_cpp_v3/action_node.h"
@@ -29,10 +33,10 @@
 namespace detectperson
 {
 
-class DetectPersonBTNode : public BT::SyncActionNode
+class DetectPersonNode : public BT::SyncActionNode
 {
 public:
-  DetectPersonBTNode(
+  DetectPersonNode(
     const std::string & name,
     const BT::NodeConfiguration & config);
 

@@ -12,8 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "final_proyect_as/FinishNode.hpp"
+#include <memory>
 #include <iostream>
+
+#include "final_proyect_as/FinishNode.hpp"
+
+#include "rclcpp/node.hpp"
+#include "rclcpp/macros.hpp"
+#include "rclcpp/rclcpp.hpp"
 
 namespace finish
 {
