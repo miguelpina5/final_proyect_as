@@ -14,6 +14,9 @@
 
 #include <string>
 #include <memory>
+#include <vector>
+#include <algorithm>
+#include <random>
 
 #include "behaviortree_cpp_v3/behavior_tree.h"
 #include "behaviortree_cpp_v3/bt_factory.h"
@@ -22,17 +25,55 @@
 #include "ament_index_cpp/get_package_share_directory.hpp"
 
 #include "rclcpp/rclcpp.hpp"
-
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
-
   auto node = rclcpp::Node::make_shared("patrolling_node");
 
+  // Pedimos el número de jugadores
+  int n_jugadores = 0;
+  std::cout << "Introduce el número de jugadores (1-5): ";
+  std::cin  >> n_jugadores;
+  if (n_jugadores < 1 || n_jugadores > 5) {
+    RCLCPP_ERROR(node->get_logger(), "Número de jugadores fuera de rango [1-5]");
+    return 1;
+  }
+
+  // Definimos lista completa de coordenadas
+  std::vector<std::pair<double,double>> coords = {
+    {0.53, 14.73}, {5.53, 18.79}, {17.02, 28.56},
+    {17.27, 14.28}, {23.74, 14.96}, {32.50, 19.02}
+  };
+
+  // Barajamos y seleccionamos n_jugadores+1 waypoints
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::shuffle(coords.begin(), coords.end(), gen);
+  int sitios = std::min(static_cast<int>(coords.size()), n_jugadores + 1);
+
+  // Creamos vector de PoseStamped
+  std::vector<geometry_msgs::msg::PoseStamped> waypoints;
+  waypoints.reserve(sitios);
+  for (int i = 0; i < sitios; ++i) {
+    geometry_msgs::msg::PoseStamped wp;
+    wp.header.frame_id = "map";
+    wp.header.stamp = node->now();
+    wp.pose.position.x = coords[i].first;
+    wp.pose.position.y = coords[i].second;
+    wp.pose.position.z = 0.0;
+    // Orientación identidad
+    wp.pose.orientation.w = 0.0;
+    wp.pose.orientation.x = 0.0;
+    wp.pose.orientation.y = 0.0;
+    wp.pose.orientation.z = 1.0;
+    waypoints.push_back(wp);
+  }
+
+  // Configuración del Behavior Tree
   BT::BehaviorTreeFactory factory;
   BT::SharedLibrary loader;
-
   factory.registerFromPlugin(loader.getOSName("move_bt_node"));
   factory.registerFromPlugin(loader.getOSName("getwp_bt_node"));
 
@@ -45,14 +86,27 @@ int main(int argc, char * argv[])
 
   rclcpp::Rate rate(10);
 
-  bool finish = false;
-  while (!finish && rclcpp::ok()) {
-       // Primero atiendo callbacks (descubro el servidor, catcheo confirmaciones…)
-       rclcpp::spin_some(node);
-       // Ahora ejecuto el tick, que enviará correctamente el goal
-       finish = tree.rootNode()->executeTick() != BT::NodeStatus::RUNNING;
-       rate.sleep();
- }
+  // Iteramos por cada waypoint seleccionado
+  for (size_t i = 0; i < waypoints.size() && rclcpp::ok(); ++i) {
+    // Publicamos en blackboard
+    blackboard->set("waypoint", waypoints[i]);
+    RCLCPP_INFO(node->get_logger(), "[Main] Enviando waypoint %zu: x=%.2f, y=%.2f", 
+                i+1, 
+                waypoints[i].pose.position.x, 
+                waypoints[i].pose.position.y);
+
+    // Ejecutamos el tree hasta que termine
+    bool finish = false;
+    while (rclcpp::ok() && !finish) {
+      rclcpp::spin_some(node);
+      finish = tree.rootNode()->executeTick() != BT::NodeStatus::RUNNING;
+      rate.sleep();
+    }
+
+    // Esperamos 2 segundos en el sitio
+    RCLCPP_INFO(node->get_logger(), "[Main] Esperando 2 segundos en el sitio...");
+    rclcpp::sleep_for(std::chrono::seconds(2));
+  }
 
   rclcpp::shutdown();
   return 0;

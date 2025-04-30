@@ -1,15 +1,12 @@
-// src/bt_nav/GetWaypoint.hpp
-
 #ifndef BT_NAV__GETWAYPOINT_HPP_
 #define BT_NAV__GETWAYPOINT_HPP_
 
 #include <string>
-#include <vector>
-#include <random>
+#include <memory>
 
 #include "behaviortree_cpp_v3/action_node.h"
-#include "geometry_msgs/msg/pose_stamped.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 namespace bt_nav
 {
@@ -21,18 +18,23 @@ public:
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
 
+  // No interrumpible
   void halt() override;
+
+  // Ejecución principal
   BT::NodeStatus tick() override;
 
+  // Definición de puertos
   static BT::PortsList providedPorts()
   {
-    return { BT::OutputPort<geometry_msgs::msg::PoseStamped>("waypoint") };
+    return {
+      BT::InputPort<geometry_msgs::msg::PoseStamped>("waypoint", "Waypoint de entrada para mapear y publicar"),
+      BT::OutputPort<geometry_msgs::msg::PoseStamped>("waypoint", "Waypoint modificado con frame y timestamp ajustados")
+    };
   }
 
 private:
-  std::vector<geometry_msgs::msg::PoseStamped> waypoints_;
-  std::mt19937 gen_;
-  std::uniform_int_distribution<size_t> dist_;
+  rclcpp::Node::SharedPtr node_;
 };
 
 }  // namespace bt_nav
