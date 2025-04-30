@@ -5,6 +5,7 @@
 
 #include "bt_nav/GetWaypoint.hpp"
 #include "behaviortree_cpp_v3/behavior_tree.h"
+#include "behaviortree_cpp_v3/bt_factory.h"
 
 namespace bt_nav
 {
@@ -76,7 +77,6 @@ BT::NodeStatus GetWaypoint::tick()
 
 }  // namespace bt_nav
 
-#include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
   factory.registerNodeType<bt_nav::GetWaypoint>("GetWaypoint");
