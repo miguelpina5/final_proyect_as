@@ -61,17 +61,17 @@ Este último comando nos generará un archivo `.yaml` que será el que lanzaremo
 ![Mapa universidad](./img/mapa.png)
 
 ## 3. Behaviour Tree
-Un behavior tree (árbol de comportamiento) es una estructura de control que organiza decisiones y acciones en forma jerárquica, permitiendo que un robot ejecute comportamientos complejos de manera modular y flexible. Cada nodo representa una acción o una condición, y el árbol se recorre para decidir qué hacer en cada momento.
+Un Behaviour Tree (árbol de comportamiento) es una estructura de control que organiza decisiones y acciones en forma jerárquica, permitiendo que un robot ejecute comportamientos complejos de manera modular y flexible. Cada nodo representa una acción o una condición, y el árbol se recorre para decidir qué hacer en cada momento.
 
-En nuestro proyecto del juego del escondite, utilizaremos un behavior tree para controlar la lógica del robot: por ejemplo, decidir si buscar un escondite, detectar si hay una persona escondida (o hablar con los jugadores). Esto nos permite separar claramente cada comportamiento y reaccionar según la situación.
+En nuestro proyecto del juego del escondite, utilizaremos un Behaviour Tree para controlar la lógica del robot: por ejemplo, decidir si buscar un escondite, detectar si hay una persona escondida (o hablar con los jugadores). Esto nos permite separar claramente cada comportamiento y reaccionar según la situación.
 
-Para diseñar este árbol de forma visual e intuitiva, hemos usado `Groot`, una herramienta que facilita la creación y edición de behavior trees compatibles con ROS2.
+Para diseñar este árbol de forma visual e intuitiva, hemos usado `Groot`, una herramienta que facilita la creación y edición de BTs compatibles con ROS2.
 
 ```bash
 ros2 run groot Groot
 ```
 
-Este es nuestro behavior tree final, el cual representa la lógica completa del juego del escondite.
+Este es nuestro BT final, el cual representa la lógica completa del juego del escondite.
 
 **(AQUI PONED ALGUNO QUE PUEDA ABRIR GROOT UNA CAPTURA)** y luego en la presentacion explicamos que pasaria en cada caso en plan si llega a un escondite pasa por aqui tal tal
 
