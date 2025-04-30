@@ -4,7 +4,7 @@
     <BehaviorTree ID="BehaviorTree">
         <Sequence name="Control">
             <RetryUntilSuccessful num_attempts="10">
-                <Action ID="RequestPlayersNode" encontrados="0" players="{num}"/>
+                <Action ID="RequestPlayersNode" encontrados="0"/>
             </RetryUntilSuccessful>
             <RetryUntilSuccessful num_attempts="{num} + 1">
                 <Fallback name="Jugar">
@@ -69,7 +69,6 @@
         </Action>
         <Action ID="RequestPlayersNode">
             <output_port default="0" name="encontrados"/>
-            <input_port name="players"/>
         </Action>
         <Action ID="Speak"/>
         <Action ID="speak">
