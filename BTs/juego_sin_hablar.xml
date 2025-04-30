@@ -1,14 +1,12 @@
 <?xml version="1.0"?>
 <root main_tree_to_execute="BehaviorTree">
-
-    <!-- ÁRBOL PRINCIPAL COMBINADO -->
+    <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
-        <!-- Secuencia de Control original -->
         <Sequence name="Control">
             <RetryUntilSuccessful num_attempts="10">
                 <Action ID="RequestPlayersNode" encontrados="0" players="{num}"/>
             </RetryUntilSuccessful>
-            <RetryUntilSuccessful num_attempts="6">
+            <RetryUntilSuccessful num_attempts="{num} + 1">
                 <Fallback name="Jugar">
                     <Condition ID="FinishNode" encontrados="{encontrados}" players="{num}"/>
                     <ForceFailure>
@@ -29,19 +27,9 @@
                 <Action ID="Navegar" goal="{origin}"/>
             </Sequence>
         </Sequence>
-
-        <!-- Secuencia de Patrulla añadido -->
-        <Sequence name="PatrolSequence">
-            <!-- GetWaypoint tomará el PoseStamped de bb “waypoint” y lo re-publicará con frame/timestamp -->
-            <Action ID="GetWaypoint" waypoint="{waypoint}"/>
-            <!-- Move recibirá ese mismo “waypoint” como goal -->
-            <Action ID="Move"      goal="{waypoint}"/>
-        </Sequence>
     </BehaviorTree>
-
-    <!-- MODELO DE NODOS Y PUERTOS FUSIONADO -->
+    <!-- ////////// -->
     <TreeNodesModel>
-        <!-- Acciones y condiciones del primer modelo -->
         <Action ID="AñadirPerson"/>
         <Action ID="Configuración"/>
         <Action ID="DetectPersonNode">
@@ -57,6 +45,9 @@
         </Condition>
         <Action ID="GetWP">
             <output_port name="WayPoint"/>
+        </Action>
+        <Action ID="GetWaypoint">
+            <input_port name="waypoint"/>
         </Action>
         <Action ID="IsPerson"/>
         <Action ID="Listen">
@@ -84,12 +75,6 @@
         <Action ID="speak">
             <input_port name="say_text"/>
         </Action>
-
-        <!-- Nodos del segundo modelo -->
-        <Action ID="GetWaypoint">
-            <input_port  name="waypoint"/>
-            <output_port name="waypoint"/>
-        </Action>
     </TreeNodesModel>
-
+    <!-- ////////// -->
 </root>
