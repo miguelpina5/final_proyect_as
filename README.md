@@ -73,13 +73,17 @@ ros2 run groot Groot
 
 Este es nuestro BT final, el cual representa la lógica completa del juego del escondite.
 
-**(AQUI PONED ALGUNO QUE PUEDA ABRIR GROOT UNA CAPTURA)** y luego en la presentacion explicamos que pasaria en cada caso en plan si llega a un escondite pasa por aqui tal tal
+![Behaviour Tree Final](./img/bt_final.png)
 
-Sin embargo, durante el desarrollo fue necesario dividir el árbol en varios subárboles más pequeños para poder probar cada comportamiento por separado y asegurarnos de que todo funcionaba correctamente paso a paso. 
+Sin embargo, durante el desarrollo fue necesario dividir el árbol en varios subárboles más pequeños para poder probar cada comportamiento por separado y asegurarnos de que todo funcionaba correctamente paso a paso.
 
-**(AQUÍ UNA CAPTURA DEL ÁRBOL PEQUEÑO DE NAVEGACIÓN)**
+Por ejemplo un BT para probar la navegación del robot hacia waypoints.
 
-**(AQUÍ UNA DEL BT MUDO)**
+![Behaviour Tree Navegación](./img/bt_nav2.png)
+
+O una prueba del escondite funcional sin diálogo.
+
+![Behaviour Tree Sin Diálogo](./img/bt_sin_dialogo.png)
 
 Esta estrategia nos permitió detectar errores fácilmente y validar el funcionamiento de cada parte antes de integrarlas en el árbol completo.
 
