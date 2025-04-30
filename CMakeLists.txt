@@ -31,12 +31,15 @@ set(dependencies
 
 include_directories(include ${ZMQ_INCLUDE_DIRS})
 
+add_library(move_bt_node SHARED src/bt_nav/Move.cpp)
+add_library(getwp_bt_node SHARED src/bt_nav/GetWaypoint.cpp)
 add_library(detectPerson_bt_node SHARED src/final_proyect_as/DetectPersonNode.cpp)
 add_library(finish_bt_node SHARED src/final_proyect_as/FinishNode.cpp)
 add_library(requestPlayer_bt_node SHARED src/final_proyect_as/RequestPlayersNode.cpp)
 
 list(APPEND plugin_libs
-
+  move_bt_node
+  getwp_bt_node
   detectPerson_bt_node
   finish_bt_node
   requestPlayer_bt_node
