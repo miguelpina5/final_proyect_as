@@ -46,26 +46,32 @@ namespace detectperson
 
   sub_ = node_->create_subscription<vision_msgs::msg::Detection2DArray>(
     "/detection_2d", 10,
-    [this](const vision_msgs::msg::Detection2DArray::SharedPtr msg)
-    {
-      for (const auto & detection : msg->detections) {
-        if (!detection.results.empty() &&
-            detection.results[0].hypothesis.class_id == "person")
-        {
-          person_detected_ = true;
-        }
-      }
-    });
+    std::bind(&DetectPersonNode::detection_callback, this, _1));
+}
 
-  executor_.add_node(node_);
+void DetectPersonNode::detection_callback(
+  const vision_msgs::msg::Detection2DArray::SharedPtr msg)
+{
+  encontrados = 0;
+  for (const auto & detection : msg->detections) {
+    if (!detection.results.empty() &&
+        detection.results[0].hypothesis.class_id == "person")
+    {
+      encontrados ++;
+      person_detected_ = true;
+    }
+  }
 }
 
 BT::NodeStatus
 DetectPersonNode::tick()
 {
   person_detected_ = false;
+  encontrados = 0;
 
   executor_.spin_some();  // ejecuta los callbacks pendientes
+
+  config().blackboard->set("encontrados", encontrados);
 
   if (person_detected_) {
     RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada");

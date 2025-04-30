@@ -21,8 +21,6 @@ int main(int argc, char ** argv)
     factory.registerFromPlugin(loader.getOSName("detectPerson_bt_node"));
     factory.registerFromPlugin(loader.getOSName("finish_bt_node"));
     factory.registerFromPlugin(loader.getOSName("requestPlayer_bt_node"));
-    factory.registerFromPlugin(loader.getOSName("move_bt_node"));
-    factory.registerFromPlugin(loader.getOSName("getwp_bt_node"));
 
     std::string pkgpath = ament_index_cpp::get_package_share_directory("final_proyect_as");
     std::string xml_file = pkgpath + "/BTs/juego_sin_hablar.xml";

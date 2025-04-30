@@ -45,6 +45,8 @@ public:
     return {};
   }
 
+  void detection_callback(const vision_msgs::msg::Detection2DArray::SharedPtr msg);
+
   BT::NodeStatus tick() override;
 
 private:
@@ -52,6 +54,7 @@ private:
   rclcpp::Subscription<vision_msgs::msg::Detection2DArray>::SharedPtr sub_;
   rclcpp::executors::SingleThreadedExecutor executor_;
   bool person_detected_;
+  int encontrados;
 };
 
 }  // namespace detectperson
