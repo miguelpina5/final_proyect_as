@@ -93,7 +93,10 @@ En el contexto de los behavior trees, una blackboard es una memoria compartida d
 
 Por ejemplo, si un nodo detecta un escondite, puede guardar sus coordenadas en la blackboard, y otro nodo, encargado de moverse, puede leer esa información para navegar hasta allí.
 
-Primero generamos los seis waypoints (escondites)
+Dentro del código `bt_nav_main.cpp`:
+
+Primero generamos los seis waypoints (escondites).
+
 
 ```cpp
 std::vector<std::pair<double,double>> coords = {
@@ -105,6 +108,49 @@ std::vector<std::pair<double,double>> coords = {
     {32.50, 19.02}
   };
 ```
+Gestionamos el número de jugadores que pueden jugar (mínimo 1 y máximo 5 porque hay 6 escondites).
+
+```cpp
+if (n_jugadores < 1 || n_jugadores > 5) {
+    RCLCPP_ERROR(node->get_logger(), "Número de jugadores fuera de rango [1-5]");
+    return 1;
+  }
+```
+Una vez tenemos los 6 waypoints, se mezclan aleatoriamente usando C++ para seleccionar los escondites. Para ello, se utiliza una fuente de aleatoriedad `(std::random_device)` y un generador de números aleatorios `(std::mt19937)` inicializado con dicha fuente. A continuación, se aplica `std::shuffle` al vector `coords`, que contiene las coordenadas de los posibles escondites, para desordenarlas de forma aleatoria. Finalmente, se seleccionan tantas posiciones como jugadores haya, más una adicional, asegurándose de no exceder el número total de coordenadas disponibles. Estas ubicaciones serán los escondites que el Kobuki recorrerá para buscar a los jugadores escondidos.
+
+```cpp
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::shuffle(coords.begin(), coords.end(), gen);
+  int sitios = std::min(static_cast<int>(coords.size()), n_jugadores + 1);
+```
+Este fragmento de código recorre una lista de waypoints y hace que el robot los visite uno por uno. Para cada waypoint:
+1. Lo publica en el blackboard (una memoria compartida usada por el árbol de comportamiento) y muestra por consola su posición.
+```cpp
+  for (size_t i = 0; i < waypoints.size() && rclcpp::ok(); ++i) {
+    blackboard->set("waypoint", waypoints[i]);
+    RCLCPP_INFO(node->get_logger(), "[Main] Enviando waypoint %zu: x=%.2f, y=%.2f", 
+                i+1, 
+                waypoints[i].pose.position.x, 
+                waypoints[i].pose.position.y);
+```
+
+2. Ejecuta el árbol de comportamiento en bucle hasta que se complete la tarea asociada a ese waypoint.
+```cpp
+    bool finish = false;
+    while (rclcpp::ok() && !finish) {
+      rclcpp::spin_some(node);
+      finish = tree.rootNode()->executeTick() != BT::NodeStatus::RUNNING;
+      rate.sleep();
+    }
+```
+3. Una vez alcanzado, espera 2 segundos antes de pasar al siguiente.
+```cpp
+    RCLCPP_INFO(node->get_logger(), "[Main] Esperando 2 segundos en el sitio...");
+    rclcpp::sleep_for(std::chrono::seconds(2));
+  }
+```
+Este ciclo continúa hasta que el robot haya recorrido todos los waypoints o hasta que el nodo de ROS se detenga. Una vez completado el recorrido, la navegación finaliza en la puerta del laboratorio, que corresponde al punto de inicio del juego y, por tanto, al origen del robot.
 
 ## 5. Yolo
 
