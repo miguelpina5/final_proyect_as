@@ -157,8 +157,42 @@ Este fragmento de código recorre una lista de waypoints y hace que el robot los
 Este ciclo continúa hasta que el robot haya recorrido todos los waypoints o hasta que el nodo de ROS se detenga. Una vez completado el recorrido, la navegación finaliza en la puerta del laboratorio, que corresponde al punto de inicio del juego y, por tanto, al origen del robot.
 
 ## 5. Yolo
+YOLO en ROS 2 es la integración de un modelo de detección de objetos en tiempo real dentro del sistema robótico ROS 2. YOLO utiliza redes neuronales para identificar y localizar múltiples objetos en una imagen con gran velocidad y precisión. En el contexto de ROS 2, se implementa como un nodo que recibe imágenes de una cámara (por ejemplo, desde el topic `/color/image_raw)`, procesa cada fotograma mediante el modelo YOLO y publica los resultados (como las clases detectadas, coordenadas de los objetos y niveles de confianza) en topics como `/yolo/detections`. Esta información es utilizada por otros nodos del robot para tareas como navegación, manipulación o interacción con el entorno.
 
-aqui lo que explique miguel mañana
+### Camera
+
+Dentro del paquete camera se encuentra este código que implementa un nodo de ROS 2 llamado `YoloDetectionNode`, diseñado para convertir detecciones de objetos generadas por un modelo YOLO a un formato estándar utilizado en ROS 2. Este nodo permite la interoperabilidad entre mensajes personalizados y mensajes estándar para visión artificial.
+
+El nodo se declara con `: Node("darkent_detection_node")`, lo que indica que su nombre interno será `darkent_detection_node`. Al inicializarse, se suscribe al topic `"input_detection"` usando el mensaje `yolo_msgs::msg::DetectionArray`, como se muestra en:
+
+```cpp
+  detection_sub_ = create_subscription<yolo_msgs::msg::DetectionArray>(
+  "input_detection", rclcpp::SensorDataQoS().reliable(),
+  std::bind(&YoloDetectionNode::detection_callback, this, _1));
+```
+
+Esto significa que el nodo recibirá las detecciones del modelo YOLO, que vienen en un formato personalizado con información como clase, puntuación y caja delimitadora.
+
+Cuando se recibe un mensaje, se ejecuta el método detection_callback, donde se crea un nuevo mensaje del tipo vision_msgs::msg::Detection2DArray, un formato estándar en ROS 2:
+
+```cpp
+vision_msgs::msg::Detection2DArray detection_array_msg;
+```
+
+Cada detección se traduce del mensaje personalizado al formato estándar copiando la información relevante y finalmente, todas las detecciones convertidas se publican en el topic "output_detection_2d":
+
+```cpp
+detection_msg.bbox.center.position.x = detection.bbox.center.position.x;
+detection_msg.bbox.size_x = detection.bbox.size.x;
+obj_msg.hypothesis.class_id = detection.class_name;
+obj_msg.hypothesis.score = detection.score;
+
+detection_pub_->publish(detection_array_msg);
+```
+
+### Detect Person Node
+
+gayyyyyyy
 
 ## 6. Sistema de diálogo
 
