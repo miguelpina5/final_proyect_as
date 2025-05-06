@@ -120,6 +120,7 @@ if (n_jugadores < 1 || n_jugadores > 5) {
     return 1;
   }
 ```
+
 Una vez tenemos los 6 waypoints, se mezclan aleatoriamente usando C++ para seleccionar los escondites. Para ello, se utiliza una fuente de aleatoriedad `(std::random_device)` y un generador de números aleatorios `(std::mt19937)` inicializado con dicha fuente. A continuación, se aplica `std::shuffle` al vector `coords`, que contiene las coordenadas de los posibles escondites, para desordenarlas de forma aleatoria. Finalmente, se seleccionan tantas posiciones como jugadores haya, más una adicional, asegurándose de no exceder el número total de coordenadas disponibles. Estas ubicaciones serán los escondites que el Kobuki recorrerá para buscar a los jugadores escondidos.
 
 ```cpp
@@ -128,7 +129,9 @@ Una vez tenemos los 6 waypoints, se mezclan aleatoriamente usando C++ para selec
   std::shuffle(coords.begin(), coords.end(), gen);
   int sitios = std::min(static_cast<int>(coords.size()), n_jugadores + 1);
 ```
+
 Este fragmento de código recorre una lista de waypoints y hace que el robot los visite uno por uno. Para cada waypoint:
+
 1. Lo publica en el blackboard (una memoria compartida usada por el árbol de comportamiento) y muestra por consola su posición.
 ```cpp
   for (size_t i = 0; i < waypoints.size() && rclcpp::ok(); ++i) {
@@ -148,12 +151,14 @@ Este fragmento de código recorre una lista de waypoints y hace que el robot los
       rate.sleep();
     }
 ```
+
 3. Una vez alcanzado, espera 2 segundos antes de pasar al siguiente.
 ```cpp
     RCLCPP_INFO(node->get_logger(), "[Main] Esperando 2 segundos en el sitio...");
     rclcpp::sleep_for(std::chrono::seconds(2));
   }
 ```
+
 Este ciclo continúa hasta que el robot haya recorrido todos los waypoints o hasta que el nodo de ROS se detenga. Una vez completado el recorrido, la navegación finaliza en la puerta del laboratorio, que corresponde al punto de inicio del juego y, por tanto, al origen del robot.
 
 ## 5. Yolo
@@ -200,4 +205,6 @@ aqui lo de hablar si podemo shacerlo al final
 
 ## 7. Demostración
 
-aqui video cuando lo terminemos
+A continuación se presenta un vídeo con la demostración del proyecto *El Escondite*, simulando una partida real. En esta grabación se pueden observar tanto el funcionamiento del sistema como la dinámica del juego en un entorno controlado.
+
+[Odio a juancams]
