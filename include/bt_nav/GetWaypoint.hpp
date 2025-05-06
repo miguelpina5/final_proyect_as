@@ -1,6 +1,7 @@
 #ifndef BT_NAV__GETWAYPOINT_HPP_
 #define BT_NAV__GETWAYPOINT_HPP_
 
+#include <rclcpp/rclcpp.hpp>
 #include "behaviortree_cpp_v3/action_node.h"
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <vector>

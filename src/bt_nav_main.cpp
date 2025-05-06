@@ -31,7 +31,7 @@ int main(int argc, char * argv[])
 {
   rclcpp::init(argc, argv);
   auto node = rclcpp::Node::make_shared("patrolling_node");
-
+  auto n_jugadores = 2;
   // Definimos lista completa de coordenadas
   std::vector<std::pair<double,double>> coords = {
     {0.53, 14.73}, {5.53, 18.79}, {17.02, 28.56},

@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <root main_tree_to_execute="BehaviorTree">
-    <!-- ////////// -->
+    <!-- //////////////////////////// -->
     <BehaviorTree ID="BehaviorTree">
         <Sequence name="Control">
             <RetryUntilSuccessful num_attempts="10">
-                <Action ID="RequestPlayersNode" encontrados="0"/>
+                <Action ID="RequestPlayersNode" players="{num}"/>
             </RetryUntilSuccessful>
             <RetryUntilSuccessful num_attempts="{num} + 1">
                 <Fallback name="Jugar">
@@ -28,7 +28,7 @@
             </Sequence>
         </Sequence>
     </BehaviorTree>
-    <!-- ////////// -->
+    <!-- //////////////////////////// -->
     <TreeNodesModel>
         <Action ID="AñadirPerson"/>
         <Action ID="Configuración"/>
@@ -68,12 +68,12 @@
             <input_port name="text"/>
         </Action>
         <Action ID="RequestPlayersNode">
-            <output_port default="0" name="encontrados"/>
+            <!-- Ahora expone solo el puerto 'players' -->
+            <output_port default="0" name="players"/>
         </Action>
         <Action ID="Speak"/>
         <Action ID="speak">
             <input_port name="say_text"/>
         </Action>
     </TreeNodesModel>
-    <!-- ////////// -->
 </root>

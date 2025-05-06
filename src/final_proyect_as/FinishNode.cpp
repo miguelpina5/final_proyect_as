@@ -20,6 +20,7 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "behaviortree_cpp_v3/bt_factory.h"
 
 namespace finish
 {
@@ -63,3 +64,10 @@ BT::NodeStatus FinishNode::tick()
 }
 
 }  // namespace finish
+
+// Registro del nodo para que el plugin exporte BT_RegisterNodesFromPlugin
+
+BT_REGISTER_NODES(factory)
+{
+  factory.registerNodeType<finish::FinishNode>("FinishNode");
+}

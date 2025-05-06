@@ -27,6 +27,7 @@
 #include "vision_msgs/msg/detection2_d_array.hpp"
 #include "vision_msgs/msg/detection2_d.hpp"
 #include "vision_msgs/msg/object_hypothesis_with_pose.hpp"
+#include "behaviortree_cpp_v3/bt_factory.h"
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -83,3 +84,9 @@ DetectPersonNode::tick()
 }
 
 }  // namespace detectperson
+
+
+BT_REGISTER_NODES(factory)
+{
+  factory.registerNodeType<detectperson::DetectPersonNode>("DetectPersonNode");
+}

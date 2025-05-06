@@ -20,6 +20,8 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "behaviortree_cpp_v3/bt_factory.h"
+
 
 namespace requestPlayers
 {
@@ -51,3 +53,10 @@ BT::NodeStatus RequestPlayersNode::tick()
 }
 
 }  // namespace requestPlayers
+
+
+// Registro del nodo para que el plugin exporte BT_RegisterNodesFromPlugin
+BT_REGISTER_NODES(factory)
+{
+  factory.registerNodeType<requestPlayers::RequestPlayersNode>("RequestPlayersNode");
+}
