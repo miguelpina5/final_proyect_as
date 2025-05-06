@@ -35,14 +35,7 @@ public:
   void halt();
   BT::NodeStatus tick();
 
-  static BT::PortsList providedPorts()
-  {
-    return BT::PortsList(
-      {
-        BT::OutputPort<geometry_msgs::msg::PoseStamped>("WayPoint")
-        BT::InputPort<nav_msgs::msg::Path>("Wps")
-      });
-  }
+  static BT::PortsList providedPorts();
 
 private:
   geometry_msgs::msg::PoseStamped wp_;

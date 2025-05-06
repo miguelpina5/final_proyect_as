@@ -1,19 +1,21 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>mi_paquete_bt</name>
+  <name>final_proyect_as</name>
   <version>0.0.1</version>
-  <description>Paquete ROS2 con BehaviorTree.CPP para juego de detección de personas</description>
-  <maintainer email="tu_email@ejemplo.com">Tu Nombre</maintainer>
-  <license>Apache-2.0</license>
+  <description>práctica final ASR</description>
+  <maintainer email="ma.pina.2023@alumnos.urjc.es">miguelpina5</maintainer>
+  <license>Apache License, Version 2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   <depend>rclcpp</depend>
-  <depend>behaviortree_cpp_v3</depend>
-  <depend>std_msgs</depend>
   <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>vision_msgs</depend>
+  <depend>yolo_msgs</depend>
+  <depend>behaviortree_cpp_v3</depend>
+  <depend>ament_index_cpp</depend>
   <depend>nav2_msgs</depend>
-  <depend>action_msgs</depend>
-  <depend>builtin_interfaces</depend>
+  <depend>rclcpp_action</depend>
 
   <exec_depend>camera</exec_depend>
 

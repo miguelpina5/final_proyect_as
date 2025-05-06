@@ -33,9 +33,14 @@ GetWaypoint::GetWaypoint(
 : BT::ActionNodeBase(xml_tag_name, conf)
 {
   rclcpp::Node::SharedPtr node;
-  int i;
   config().blackboard->get("node", node);
-  config().blackboard->get("i", i);
+}
+
+BT::PortsList GetWaypoint::providedPorts()
+{
+  return { 
+    BT::OutputPort<int>("WayPoint"),
+  };
 }
 
 void
@@ -46,11 +51,14 @@ GetWaypoint::halt()
 BT::NodeStatus
 GetWaypoint::tick()
 {
-  getInput("Wps", wps_array_);
+  int i;
   setOutput("WayPoint", wp_);
+  config().blackboard->get("Wps", wps_array_);
+  config().blackboard->get("i", i);
 
-  wp_ = wps_array_.poses[i]
+  wp_ = wps_array_.poses[i];  
   i++;
+  config().blackboard->set<int>("i", i);
   return BT::NodeStatus::SUCCESS;
 }
 

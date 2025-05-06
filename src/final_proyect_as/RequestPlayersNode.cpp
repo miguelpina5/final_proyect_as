@@ -36,12 +36,14 @@ BT::PortsList RequestPlayersNode::providedPorts()
   return { 
     BT::OutputPort<int>("players"),
     BT::OutputPort<int>("encontrados"),
-    BT::OutputPort<int>("intentos")
+    BT::OutputPort<int>("num_intento")
   };
 }
 
 BT::NodeStatus RequestPlayersNode::tick()
 {
+  std::cout << "------";
+
   std::cout << "¿Cuántos jugadores van a participar? ";
   std::cin >> num_players_;
 
@@ -52,10 +54,13 @@ BT::NodeStatus RequestPlayersNode::tick()
 
   int find_players = 0;
   int num_attempts = num_players_ + 1;
+  int i = 0;
   // Guardamos en el blackboard
   setOutput("players", num_players_);
   setOutput("encontrados", find_players);
-  setOutput("intentos", num_attempts);
+  setOutput("num_intento", num_attempts);
+  config().blackboard->set<bool>("first_time", true);
+  config().blackboard->set<int>("i", i);
 
   return BT::NodeStatus::SUCCESS;
 }

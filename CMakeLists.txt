@@ -36,6 +36,7 @@ add_library(getwp_bt_node SHARED src/final_proyect_as/GetWaypoint.cpp)
 add_library(detectPerson_bt_node SHARED src/final_proyect_as/DetectPersonNode.cpp)
 add_library(finish_bt_node SHARED src/final_proyect_as/FinishNode.cpp)
 add_library(requestPlayer_bt_node SHARED src/final_proyect_as/RequestPlayersNode.cpp)
+add_library(randomWp_bt_node SHARED src/final_proyect_as/RandomWP.cpp)
 
 list(APPEND plugin_libs
   move_bt_node
@@ -43,6 +44,7 @@ list(APPEND plugin_libs
   detectPerson_bt_node
   finish_bt_node
   requestPlayer_bt_node
+  randomWp_bt_node
 )
 
 foreach(bt_plugin ${plugin_libs})
@@ -53,17 +55,15 @@ endforeach()
 add_executable(final_proyect src/main_bt.cpp)
 ament_target_dependencies(final_proyect ${dependencies})
 
-add_executable(bt_nav src/bt_nav_main.cpp)
-ament_target_dependencies(bt_nav ${dependencies})
-
 install(TARGETS
   ${plugin_libs}
   final_proyect
-  bt_nav
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
+
+install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 
 install(DIRECTORY include/
   DESTINATION include/

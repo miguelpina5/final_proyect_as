@@ -21,6 +21,8 @@
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
 #include "behaviortree_cpp_v3/bt_factory.h"
+#include "nav_msgs/msg/path.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 namespace finish
 {
@@ -42,14 +44,35 @@ BT::NodeStatus FinishNode::tick()
 {
   int num_players_;
   int find_players;
+  int i;
+  nav_msgs::msg::Path wps_array_;
 
   getInput("players", num_players_);
   getInput("encontrados", find_players);
+  config().blackboard->get("i", i);
+  config().blackboard->get("Wps", wps_array_);
 
   std::cout << "Jugadores: " << num_players_ << "\nEncontrados: " << find_players << std::endl;
 
   if (find_players == num_players_) {
     std::cout << "Todos los jugadores han sido encontrados." << std::endl;
+    i = 0;
+
+    geometry_msgs::msg::PoseStamped ps;
+
+    ps.pose.position.x = -3.06;
+    ps.pose.position.y = 24.17;
+    ps.pose.position.z = 0;
+
+    ps.pose.orientation.x = 0.0;
+    ps.pose.orientation.y = 0.0;
+    ps.pose.orientation.z = 0.0;
+    ps.pose.orientation.w = 1.0;
+
+    wps_array_.poses[i] = ps;
+    
+    config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
+    config().blackboard->set<int>("i", i);
     return BT::NodeStatus::SUCCESS;
   }
 

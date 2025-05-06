@@ -6,27 +6,6 @@
             <RetryUntilSuccessful num_attempts="5">
                 <Action ID="RequestPlayersNode" encontrados="{find_players}" num_intento="{intentos}" players="{jugadores}"/>
             </RetryUntilSuccessful>
-            <RetryUntilSuccessful num_attempts="{intentos}">
-                <Fallback name="Jugar">
-                    <Condition ID="FinishNode" encontrados="{find_players}" players="{jugadores}"/>
-                    <ForceFailure>
-                        <Sequence name="Partida">
-                            <Action ID="RandomWP" players="{jugadores}"/>
-                            <Action ID="GetWaypoint" WayPoint="{wp}"/>
-                            <RetryUntilSuccessful num_attempts="3">
-                                <Action ID="Navegar" WayPoint="{wp}"/>
-                            </RetryUntilSuccessful>
-                            <ForceSuccess>
-                                <Action ID="DetectPersonNode" encontrados="{find_players}"/>
-                            </ForceSuccess>
-                        </Sequence>
-                    </ForceFailure>
-                </Fallback>
-            </RetryUntilSuccessful>
-            <Sequence name="FinJuego">
-                <Action ID="GetWaypoint" WayPoint="{origin}"/>
-                <Action ID="Navegar" WayPoint="{origin}"/>
-            </Sequence>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
@@ -44,8 +23,12 @@
             <input_port name="encontrados"/>
             <input_port name="players"/>
         </Condition>
-        <Action ID="GetWaypoint">
+        <Action ID="GetWP">
             <output_port default="{origin}" name="WayPoint"/>
+            <input_port default="{wps_array}" name="Wps"/>
+        </Action>
+        <Action ID="GetWaypoint">
+            <input_port name="waypoint"/>
         </Action>
         <Condition ID="IsPerson"/>
         <Action ID="Listen">
@@ -66,6 +49,7 @@
             <input_port name="text"/>
         </Action>
         <Action ID="RandomWP">
+            <output_port default="{wps_aray}" name="Wps"/>
             <input_port default="{jugadores}" name="players"/>
         </Action>
         <Action ID="RequestPlayersNode">

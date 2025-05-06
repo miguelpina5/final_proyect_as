@@ -61,19 +61,12 @@ public:
   void halt();
   BT::NodeStatus tick();
 
-  static BT::PortsList providedPorts()
-  {
-    return BT::PortsList(
-      {
-        BT::OutputPort<std_msgs::msg::UInt8>("players")
-        BT::InputPort<nav_msgs::msg::Path>("Wps")
-      });
-  }
+  static BT::PortsList providedPorts();
 
 private:
     
-    nav_msgs::msg::Path wps_array_;
-    std_msgs::msg::Bool juego_inciado;
+  nav_msgs::msg::Path wps_array_;
+  bool first_time;
 };
 
 }  // namespace bt_nav

@@ -49,6 +49,13 @@ GetWaypoint::GetWaypoint(
 
 }
 
+BT::PortsList GetWaypoint::providedPorts()
+{
+  return { 
+    BT::InputPort<int>("players")
+  };
+}
+
 void
 GetWaypoint::halt()
 {
@@ -57,31 +64,34 @@ GetWaypoint::halt()
 BT::NodeStatus
 GetWaypoint::tick()
 {
-    getInput("players", jugadores_);
-    setOutput("Wps", wps_array_);
+  getInput("players", jugadores_);
+  config().blackboard->get("first_time", first_time);
 
-    if(juego_inciado =  true){
-        geometry_msgs::msg::PoseStamped ps;
-        wps_array_.header.stamp = this->now();
-        wps_array_.header.frame_id = "map";
-    
-        for(int i = 0; i != jugadores_ + 1; i++){
-            geometry_msgs::msg::PoseStamped ps;
-            idx = random1to6_no_repeat();
+  if(first_time){
+    geometry_msgs::msg::PoseStamped ps;
+    wps_array_.header.stamp = this->now();
+    wps_array_.header.frame_id = "map";
 
-            ps.pose.position.x = coords_[idx].first;
-            ps.pose.position.y = coords_[idx].second;
-            ps.pose.position.z = 0;
+    for(int i = 0; i != jugadores_ + 1; i++){
+      geometry_msgs::msg::PoseStamped ps;
+      idx = random1to6_no_repeat();
 
-            pose.orientation.x = orientation_[idx].first;
-            pose.orientation.y = 0.0;
-            pose.orientation.z = 0.0;
-            pose.orientation.w = orientation_[idx].second;
+      ps.pose.position.x = coords_[idx].first;
+      ps.pose.position.y = coords_[idx].second;
+      ps.pose.position.z = 0;
 
-            wps_array_.poses.push_back(ps);
-        }
+      ps.pose.orientation.x = orientation_[idx].first;
+      ps.pose.orientation.y = 0.0;
+      ps.pose.orientation.z = 0.0;
+      ps.pose.orientation.w = orientation_[idx].second;
+
+      wps_array_.poses.push_back(ps);
     }
-    
+
+    config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
+    first_time = false;
+    config().blackboard->set<bool>("first_time", first_time);
+  }  
 
   return BT::NodeStatus::SUCCESS;
 }
