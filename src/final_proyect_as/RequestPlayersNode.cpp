@@ -20,6 +20,8 @@
 #include "rclcpp/node.hpp"
 #include "rclcpp/macros.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "behaviortree_cpp_v3/bt_factory.h"
+
 
 namespace requestPlayers
 {
@@ -31,7 +33,11 @@ RequestPlayersNode::RequestPlayersNode(const std::string & name, const BT::NodeC
 
 BT::PortsList RequestPlayersNode::providedPorts()
 {
-  return { BT::OutputPort<int>("players") };
+  return { 
+    BT::OutputPort<int>("players"),
+    BT::OutputPort<int>("encontrados"),
+    BT::OutputPort<int>("intentos")
+  };
 }
 
 BT::NodeStatus RequestPlayersNode::tick()
@@ -44,10 +50,21 @@ BT::NodeStatus RequestPlayersNode::tick()
     return BT::NodeStatus::FAILURE;
   }
 
+  int find_players = 0;
+  int num_attempts = num_players_ + 1;
   // Guardamos en el blackboard
   setOutput("players", num_players_);
+  setOutput("encontrados", find_players);
+  setOutput("intentos", num_attempts);
 
   return BT::NodeStatus::SUCCESS;
 }
 
 }  // namespace requestPlayers
+
+
+// Registro del nodo para que el plugin exporte BT_RegisterNodesFromPlugin
+BT_REGISTER_NODES(factory)
+{
+  factory.registerNodeType<requestPlayers::RequestPlayersNode>("RequestPlayersNode");
+}

@@ -40,13 +40,9 @@ public:
     const std::string & name,
     const BT::NodeConfiguration & config);
 
-  static BT::PortsList providedPorts()
-  {
-    return {};
-  }
+  static BT::PortsList providedPorts();
 
   void detection_callback(const vision_msgs::msg::Detection2DArray::SharedPtr msg);
-
   BT::NodeStatus tick() override;
 
 private:
@@ -55,6 +51,7 @@ private:
   rclcpp::executors::SingleThreadedExecutor executor_;
   bool person_detected_;
   int encontrados;
+  int encontrado_yolo;
 };
 
 }  // namespace detectperson

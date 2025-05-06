@@ -40,22 +40,15 @@ BT::PortsList FinishNode::providedPorts()
 
 BT::NodeStatus FinishNode::tick()
 {
-  int players = 0;
-  int encontrados = 0;
+  int num_players_;
+  int find_players;
 
-  if (!getInput("players", players)) {
-    std::cerr << "No se pudo obtener el número de jugadores desde el blackboard" << std::endl;
-    return BT::NodeStatus::FAILURE;
-  }
+  getInput("players", num_players_);
+  getInput("encontrados", find_players);
 
-  if (!getInput("encontrados", encontrados)) {
-    std::cerr << "No se pudo obtener el número de encontrados desde el blackboard" << std::endl;
-    return BT::NodeStatus::FAILURE;
-  }
+  std::cout << "Jugadores: " << num_players_ << "\nEncontrados: " << find_players << std::endl;
 
-  std::cout << "Jugadores: " << players << " - Encontrados: " << encontrados << std::endl;
-
-  if (encontrados == players) {
+  if (find_players == num_players_) {
     std::cout << "Todos los jugadores han sido encontrados." << std::endl;
     return BT::NodeStatus::SUCCESS;
   }

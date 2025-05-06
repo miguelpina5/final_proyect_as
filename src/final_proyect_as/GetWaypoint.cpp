@@ -14,6 +14,14 @@ GetWaypoint::GetWaypoint(
   config().blackboard->get("node", node_);
 }
 
+// BT::PortsList GetWaypoint::providedPorts()
+// {
+//   return {
+//     BT::InputPort<int>("players")
+//     BT::OutputPort<int>("")
+//   };
+// }
+
 BT::NodeStatus GetWaypoint::tick()
 {
   // Inicialización en el primer tick

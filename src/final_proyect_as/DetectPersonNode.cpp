@@ -53,15 +53,22 @@ namespace detectperson
 void DetectPersonNode::detection_callback(
   const vision_msgs::msg::Detection2DArray::SharedPtr msg)
 {
-  encontrados = 0;
+  encontrado_yolo = 0;
   for (const auto & detection : msg->detections) {
     if (!detection.results.empty() &&
         detection.results[0].hypothesis.class_id == "person")
     {
-      encontrados ++;
+      encontrado_yolo ++;
       person_detected_ = true;
     }
   }
+}
+
+BT::PortsList DetectPersonNode::providedPorts()
+{
+  return {
+    BT::OutputPort<int>("encontrados")
+  };
 }
 
 BT::NodeStatus
@@ -72,10 +79,12 @@ DetectPersonNode::tick()
 
   executor_.spin_some();  // ejecuta los callbacks pendientes
 
-  config().blackboard->set("encontrados", encontrados);
+  config().blackboard->get("encontrados", encontrados);
+  encontrados = encontrados + encontrado_yolo;
+  setOutput("encontrados", encontrados);
 
   if (person_detected_) {
-    RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada");
+    RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);
     return BT::NodeStatus::SUCCESS;
   }
 
