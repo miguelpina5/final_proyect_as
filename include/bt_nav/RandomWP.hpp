@@ -12,47 +12,46 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BT_NAV__MOVE_HPP_
-#define BT_NAV__MOVE_HPP_
+#ifndef BT_NAV__GETWAYPOINT_HPP_
+#define BT_NAV__GETWAYPOINT_HPP_
 
 #include <string>
-#include <iostream>
-#include <vector>
-#include <memory>
 
-#include "geometry_msgs/msg/pose_stamped.hpp"
-#include "nav2_msgs/action/navigate_to_pose.hpp"
-
-#include "bt_nav/ctrl_support/BTActionNode.hpp"
 #include "behaviortree_cpp_v3/behavior_tree.h"
 #include "behaviortree_cpp_v3/bt_factory.h"
+#include "nav_msgs/msg/path.hpp"
+#include "geometry_msgs/msg/pose_stamped.hpp"
 
 namespace bt_nav
 {
 
-class Move : public bt_nav::BtActionNode<nav2_msgs::action::NavigateToPose>
+class GetWaypoint : public BT::ActionNodeBase
 {
 public:
-  explicit Move(
+  explicit GetWaypoint(
     const std::string & xml_tag_name,
-    const std::string & action_name,
     const BT::NodeConfiguration & conf);
 
-  void on_tick() override;
-  BT::NodeStatus on_success() override;
+    std::vector<std::pair<double,double>> coords_;
+    std::vector<std::pair<double,double>> orientation_;
+
+  void halt();
+  BT::NodeStatus tick();
 
   static BT::PortsList providedPorts()
   {
     return BT::PortsList(
       {
-        BT::InputPort<geometry_msgs::msg::PoseStamped>("goal")
+        BT::OutputPort<std_msgs::msg::UInt8>("players")
+        BT::InputPort<nav_msgs::msg::Path>("Wps")
       });
   }
 
 private:
+  geometry_msgs::msg::PoseStamped wp_;
+  nav_msgs::msg::Path wps_array_;
 };
-
 
 }  // namespace bt_nav
 
-#endif  // BT_NAV__MOVE_HPP_
+#endif  // BT_NAV__GETWAYPOINT_HPP_

@@ -33,9 +33,22 @@ GetWaypoint::GetWaypoint(
 : BT::ActionNodeBase(xml_tag_name, conf)
 {
   rclcpp::Node::SharedPtr node;
-  int i;
   config().blackboard->get("node", node);
-  config().blackboard->get("i", i);
+
+  coords_ = {
+    {0.53, 14.73}, {5.53, 18.79}, {17.02, 28.56},
+    {17.27, 14.28}, {23.74, 14.96}, {32.50, 19.02},
+    {-3.06, 24.17}
+  };
+
+  orientation_ = {
+    {0, 1}, {0, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1}
+  };
+
+  std::random_device rd;
+  gen_ = std::mt19937(rd());
+  dist_ = std::uniform_int_distribution<size_t>(0, coords_.size() - 1);
+
 }
 
 void
@@ -46,11 +59,10 @@ GetWaypoint::halt()
 BT::NodeStatus
 GetWaypoint::tick()
 {
-  getInput("Wps", wps_array_);
-  setOutput("WayPoint", wp_);
+  getInput("players", jugadores_);
+  setOutput("Wps", wps_array_);
 
-  wp_ = wps_array_.poses[i]
-  i++;
+
   return BT::NodeStatus::SUCCESS;
 }
 
