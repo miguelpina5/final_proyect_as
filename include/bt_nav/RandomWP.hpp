@@ -25,6 +25,28 @@
 namespace bt_nav
 {
 
+inline int random1to6_no_repeat() {
+    // Generador y device estáticos para conservar el estado
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    // Pool de números disponibles
+    static std::vector<int> pool = {1,2,3,4,5,6};
+
+    // Si ya no quedan números, vuelvo a rellenar
+    if (pool.empty()) {
+        pool = {1,2,3,4,5,6};
+    }
+
+    // Elijo aleatoriamente un índice en [0, pool.size()-1]
+    std::uniform_int_distribution<size_t> dist(0, pool.size()-1);
+    size_t idx = dist(gen);
+
+    // Extraigo el valor y lo quito del pool
+    int value = pool[idx];
+    pool.erase(pool.begin() + idx);
+
+    return value;
+}
 class GetWaypoint : public BT::ActionNodeBase
 {
 public:
@@ -34,6 +56,7 @@ public:
 
     std::vector<std::pair<double,double>> coords_;
     std::vector<std::pair<double,double>> orientation_;
+    
 
   void halt();
   BT::NodeStatus tick();
@@ -48,8 +71,9 @@ public:
   }
 
 private:
-  geometry_msgs::msg::PoseStamped wp_;
-  nav_msgs::msg::Path wps_array_;
+    
+    nav_msgs::msg::Path wps_array_;
+    std_msgs::msg::Bool juego_inciado;
 };
 
 }  // namespace bt_nav

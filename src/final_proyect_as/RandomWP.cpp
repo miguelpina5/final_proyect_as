@@ -16,13 +16,15 @@
 #include <iostream>
 #include <vector>
 
-#include "bt_nav/GetWaypoint.hpp"
-
+#include "bt_nav/RandomWP.hpp"
 #include "behaviortree_cpp_v3/behavior_tree.h"
 
 #include "geometry_msgs/msg/pose_stamped.hpp"
-
+#include <random>
+#include "std_msgs/msg/bool.hpp"
 #include "rclcpp/rclcpp.hpp"
+
+
 
 namespace bt_nav
 {
@@ -45,10 +47,6 @@ GetWaypoint::GetWaypoint(
     {0, 1}, {0, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1}
   };
 
-  std::random_device rd;
-  gen_ = std::mt19937(rd());
-  dist_ = std::uniform_int_distribution<size_t>(0, coords_.size() - 1);
-
 }
 
 void
@@ -59,9 +57,31 @@ GetWaypoint::halt()
 BT::NodeStatus
 GetWaypoint::tick()
 {
-  getInput("players", jugadores_);
-  setOutput("Wps", wps_array_);
+    getInput("players", jugadores_);
+    setOutput("Wps", wps_array_);
 
+    if(juego_inciado =  true){
+        geometry_msgs::msg::PoseStamped ps;
+        wps_array_.header.stamp = this->now();
+        wps_array_.header.frame_id = "map";
+    
+        for(int i = 0; i != jugadores_ + 1; i++){
+            geometry_msgs::msg::PoseStamped ps;
+            idx = random1to6_no_repeat();
+
+            ps.pose.position.x = coords_[idx].first;
+            ps.pose.position.y = coords_[idx].second;
+            ps.pose.position.z = 0;
+
+            pose.orientation.x = orientation_[idx].first;
+            pose.orientation.y = 0.0;
+            pose.orientation.z = 0.0;
+            pose.orientation.w = orientation_[idx].second;
+
+            wps_array_.poses.push_back(ps);
+        }
+    }
+    
 
   return BT::NodeStatus::SUCCESS;
 }
