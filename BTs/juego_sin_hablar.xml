@@ -3,28 +3,29 @@
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
         <Sequence name="Control">
-            <RetryUntilSuccessful num_attempts="10">
-                <Action ID="RequestPlayersNode" encontrados="0"/>
+            <RetryUntilSuccessful num_attempts="5">
+                <Action ID="RequestPlayersNode" encontrados="{find_players}" num_attempts="{intentos}" players="{jugadores}"/>
             </RetryUntilSuccessful>
-            <RetryUntilSuccessful num_attempts="{num} + 1">
+            <RetryUntilSuccessful num_attempts="{intentos}">
                 <Fallback name="Jugar">
-                    <Condition ID="FinishNode" encontrados="{encontrados}" players="{num}"/>
+                    <Condition ID="FinishNode" encontrados="{find_players}" players="{jugadores}"/>
                     <ForceFailure>
                         <Sequence name="Partida">
-                            <Action ID="GetWP" WayPoint="{wp}"/>
-                            <RetryUntilSuccessful num_attempts="10">
-                                <Action ID="Navegar" goal="{wp}"/>
+                            <Action ID="RandomWP" Wps="{wps_array}" players="{jugadores}"/>
+                            <Action ID="GetWP" WayPoint="{wp}" Wps="{wps_array}"/>
+                            <RetryUntilSuccessful num_attempts="3">
+                                <Action ID="Navegar" WayPoint="{wp}"/>
                             </RetryUntilSuccessful>
                             <ForceSuccess>
-                                <Action ID="DetectPersonNode" encontrados="{encontrados}"/>
+                                <Action ID="DetectPersonNode" encontrados="{find_players}"/>
                             </ForceSuccess>
                         </Sequence>
                     </ForceFailure>
                 </Fallback>
             </RetryUntilSuccessful>
             <Sequence name="FinJuego">
-                <Action ID="GetWP" WayPoint="{origin}"/>
-                <Action ID="Navegar" goal="{origin}"/>
+                <Action ID="GetWP" WayPoint="{origin}" Wps="{wps_array}"/>
+                <Action ID="Navegar" WayPoint="{origin}"/>
             </Sequence>
         </Sequence>
     </BehaviorTree>
@@ -44,12 +45,13 @@
             <input_port name="players"/>
         </Condition>
         <Action ID="GetWP">
-            <output_port name="WayPoint"/>
+            <output_port default="{origin}" name="WayPoint"/>
+            <input_port default="{wps_array}" name="Wps"/>
         </Action>
         <Action ID="GetWaypoint">
             <input_port name="waypoint"/>
         </Action>
-        <Action ID="IsPerson"/>
+        <Condition ID="IsPerson"/>
         <Action ID="Listen">
             <output_port name="listen_text"/>
         </Action>
@@ -57,7 +59,7 @@
             <input_port name="goal"/>
         </Action>
         <Action ID="Navegar">
-            <input_port name="goal"/>
+            <input_port name="WayPoint"/>
         </Action>
         <Action ID="Num_jugadores">
             <input_port name="jugadores"/>
@@ -67,8 +69,14 @@
             <output_port name="intention_value"/>
             <input_port name="text"/>
         </Action>
+        <Action ID="RandomWP">
+            <output_port default="{wps_aray}" name="Wps"/>
+            <input_port default="{jugadores}" name="players"/>
+        </Action>
         <Action ID="RequestPlayersNode">
-            <output_port default="0" name="encontrados"/>
+            <output_port default="{find_players}" name="encontrados"/>
+            <output_port default="{intentos}" name="num_attempts"/>
+            <output_port default="{jugadores}" name="players"/>
         </Action>
         <Action ID="Speak"/>
         <Action ID="speak">
