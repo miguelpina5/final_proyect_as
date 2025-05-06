@@ -3,13 +3,9 @@
     <!-- //////////////////////////// -->
     <BehaviorTree ID="BehaviorTree">
         <Sequence name="Control">
-<<<<<<< HEAD
             <RetryUntilSuccessful num_attempts="5">
                 <Action ID="RequestPlayersNode" encontrados="{find_players}" num_attempts="{intentos}" players="{jugadores}"/>
-=======
-            <RetryUntilSuccessful num_attempts="10">
-                <Action ID="RequestPlayersNode" players="{num}"/>
->>>>>>> refs/remotes/origin/main
+
             </RetryUntilSuccessful>
             <RetryUntilSuccessful num_attempts="{intentos}">
                 <Fallback name="Jugar">
@@ -79,14 +75,9 @@
             <input_port default="{jugadores}" name="players"/>
         </Action>
         <Action ID="RequestPlayersNode">
-<<<<<<< HEAD
             <output_port default="{find_players}" name="encontrados"/>
             <output_port default="{intentos}" name="num_attempts"/>
             <output_port default="{jugadores}" name="players"/>
-=======
-            <!-- Ahora expone solo el puerto 'players' -->
-            <output_port default="0" name="players"/>
->>>>>>> refs/remotes/origin/main
         </Action>
         <Action ID="Speak"/>
         <Action ID="speak">
