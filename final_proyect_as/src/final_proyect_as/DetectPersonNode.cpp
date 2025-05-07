@@ -86,11 +86,8 @@ DetectPersonNode::tick()
   }
   
   config().blackboard->get("encontrados", find_players);
-  RCLCPP_INFO(node_->get_logger(), "encontrado totales antes de sumar yolo: %d", find_players);
 
   find_players = find_players + encontrado_yolo;
-
-  RCLCPP_INFO(node_->get_logger(), "encontrado totales despues de sumar yolo: %d", find_players);
   setOutput("encontrados", find_players);
 
   RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);

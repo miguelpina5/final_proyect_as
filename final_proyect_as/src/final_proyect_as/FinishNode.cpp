@@ -57,7 +57,13 @@ BT::NodeStatus FinishNode::tick()
   std::cout << "Jugadores: " << num_players_ << "\nEncontrados hasta el momento: " << find_players << std::endl;
 
   if (find_players == num_players_ || escondites == i) {
-    std::cout << "Todos los jugadores han sido encontrados." << std::endl;
+
+    if (find_players == num_players_){
+      std::cout << "TODOS LOS JUGADORES HAN SIDO ENCONTRADOS, HE GANADO" << std::endl;
+    } else {
+     std::cout << "FINALIZADO EL NÚMERO DE INTENTOS, HE PERDIDO" << std::endl;
+    }
+    std::cout << "Yendo al punto de inicio." << std::endl;
     i = 0;
 
     geometry_msgs::msg::PoseStamped ps;
@@ -74,7 +80,7 @@ BT::NodeStatus FinishNode::tick()
     
     config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
     config().blackboard->set<int>("i", i);
-    std::cout << "enviado bien" << std::endl;
+    std::cout << "** NAVIGATION SUCCEEDED **" << std::endl;
     return BT::NodeStatus::SUCCESS;
 
   } else {
