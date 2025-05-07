@@ -41,7 +41,7 @@ RandomWP::RandomWP(
     {0.53, 14.73},  // Escondite 1 Lado derecho lab
     {5.53, 18.79},  // Escondite 2 Lado izquierdo lab
     {17.02, 28.56}, // Escondite 3 Ascensor
-    {17.27, 14.28}, // Escondite 4 Circulo
+    {17.06, 14.07}, // Escondite 4 Circulo
     {23.74, 14.96}, // Escondite 5 Pasillo derecha
     {32.50, 19.02}, // Escondite 6 Fondo
   };
@@ -50,7 +50,7 @@ RandomWP::RandomWP(
     {1, 0},  // Escondite 1 lado derecho lab
     {1, 0},  // Escondite 2 lado izquierdo lab
     {0  , 1},  // Escondite 3 Ascensor
-    {-0.72187, 0.69203}, // Escondite 4 Circulo
+    {-0.73624, 0.67672}, // Escondite 4 Circulo
     {-1, 0.0},  // Escondite 5 Pasillo derecha
     {-0.7236, 0.6902}   // Escondite 6 Fondo
   };
