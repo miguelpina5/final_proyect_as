@@ -29,7 +29,7 @@ void
 Move::on_tick()
 {
   geometry_msgs::msg::PoseStamped goal;
-  getInput("goal", goal);
+  getInput("way_point", goal);
 
   goal_.pose = goal;
 }

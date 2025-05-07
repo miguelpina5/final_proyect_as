@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef BT_NAV__GETWAYPOINT_HPP_
-#define BT_NAV__GETWAYPOINT_HPP_
+#ifndef BT_NAV__RandomWP_HPP_
+#define BT_NAV__RandomWP_HPP_
 
 #include <string>
 
@@ -21,6 +21,7 @@
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "nav_msgs/msg/path.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include <random>
 
 namespace bt_nav
 {
@@ -47,10 +48,10 @@ inline int random1to6_no_repeat() {
 
     return value;
 }
-class GetWaypoint : public BT::ActionNodeBase
+class RandomWP : public BT::ActionNodeBase
 {
 public:
-  explicit GetWaypoint(
+  explicit RandomWP(
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
 
@@ -66,9 +67,11 @@ public:
 private:
     
   nav_msgs::msg::Path wps_array_;
-  bool first_time;
+  bool first_time_;
+  int jugadores_;
+  size_t idx;
 };
 
 }  // namespace bt_nav
 
-#endif  // BT_NAV__GETWAYPOINT_HPP_
+#endif  // BT_NAV__RandomWP_HPP_

@@ -12,9 +12,9 @@
                     <ForceFailure>
                         <Sequence name="Partida">
                             <Action ID="RandomWP" players="{jugadores}"/>
-                            <Action ID="GetWaypoint" WayPoint="{wp}"/>
+                            <Action ID="GetWaypoint" way_point="{wp}"/>
                             <RetryUntilSuccessful num_attempts="3">
-                                <Action ID="Navegar" WayPoint="{wp}"/>
+                                <Action ID="Move" way_point="{wp}"/>
                             </RetryUntilSuccessful>
                             <ForceSuccess>
                                 <Action ID="DetectPersonNode" encontrados="{find_players}"/>
@@ -24,15 +24,13 @@
                 </Fallback>
             </RetryUntilSuccessful>
             <Sequence name="FinJuego">
-                <Action ID="GetWaypoint" WayPoint="{origin}"/>
-                <Action ID="Navegar" WayPoint="{origin}"/>
+                <Action ID="GetWaypoint" way_point="{wp}"/>
+                <Action ID="Move" way_point="{wp}"/>
             </Sequence>
         </Sequence>
     </BehaviorTree>
     <!-- ////////// -->
     <TreeNodesModel>
-        <Action ID="AñadirPerson"/>
-        <Action ID="Configuración"/>
         <Action ID="DetectPersonNode">
             <output_port name="encontrados"/>
         </Action>
@@ -45,17 +43,14 @@
             <input_port name="players"/>
         </Condition>
         <Action ID="GetWaypoint">
-            <output_port default="{origin}" name="WayPoint"/>
+            <output_port default="{wp}" name="way_point"/>
         </Action>
         <Condition ID="IsPerson"/>
         <Action ID="Listen">
             <output_port name="listen_text"/>
         </Action>
         <Action ID="Move">
-            <input_port name="goal"/>
-        </Action>
-        <Action ID="Navegar">
-            <input_port name="WayPoint"/>
+            <input_port name="way_point"/>
         </Action>
         <Action ID="Num_jugadores">
             <input_port name="jugadores"/>

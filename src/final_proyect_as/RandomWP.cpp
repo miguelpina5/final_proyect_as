@@ -29,7 +29,7 @@
 namespace bt_nav
 {
 
-GetWaypoint::GetWaypoint(
+RandomWP::RandomWP(
   const std::string & xml_tag_name,
   const BT::NodeConfiguration & conf)
 : BT::ActionNodeBase(xml_tag_name, conf)
@@ -40,16 +40,15 @@ GetWaypoint::GetWaypoint(
   coords_ = {
     {0.53, 14.73}, {5.53, 18.79}, {17.02, 28.56},
     {17.27, 14.28}, {23.74, 14.96}, {32.50, 19.02},
-    {-3.06, 24.17}
   };
 
   orientation_ = {
-    {0, 1}, {0, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1}
+    {1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1}
   };
 
 }
 
-BT::PortsList GetWaypoint::providedPorts()
+BT::PortsList RandomWP::providedPorts()
 {
   return { 
     BT::InputPort<int>("players")
@@ -57,19 +56,18 @@ BT::PortsList GetWaypoint::providedPorts()
 }
 
 void
-GetWaypoint::halt()
+RandomWP::halt()
 {
 }
 
 BT::NodeStatus
-GetWaypoint::tick()
+RandomWP::tick()
 {
   getInput("players", jugadores_);
-  config().blackboard->get("first_time", first_time);
+  config().blackboard->get("first_time", first_time_);
 
-  if(first_time){
+  if(first_time_){
     geometry_msgs::msg::PoseStamped ps;
-    wps_array_.header.stamp = this->now();
     wps_array_.header.frame_id = "map";
 
     for(int i = 0; i != jugadores_ + 1; i++){
@@ -89,9 +87,9 @@ GetWaypoint::tick()
     }
 
     config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
-    first_time = false;
-    config().blackboard->set<bool>("first_time", first_time);
-  }  
+    first_time_ = false;
+    config().blackboard->set<bool>("first_time", first_time_);
+  }
 
   return BT::NodeStatus::SUCCESS;
 }
@@ -101,5 +99,5 @@ GetWaypoint::tick()
 #include "behaviortree_cpp_v3/bt_factory.h"
 BT_REGISTER_NODES(factory)
 {
-  factory.registerNodeType<bt_nav::GetWaypoint>("GetWaypoint");
+  factory.registerNodeType<bt_nav::RandomWP>("RandomWP");
 }

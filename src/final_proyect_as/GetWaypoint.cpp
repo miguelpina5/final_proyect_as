@@ -36,13 +36,6 @@ GetWaypoint::GetWaypoint(
   config().blackboard->get("node", node);
 }
 
-BT::PortsList GetWaypoint::providedPorts()
-{
-  return { 
-    BT::OutputPort<int>("WayPoint"),
-  };
-}
-
 void
 GetWaypoint::halt()
 {
@@ -52,7 +45,7 @@ BT::NodeStatus
 GetWaypoint::tick()
 {
   int i;
-  setOutput("WayPoint", wp_);
+  setOutput("way_point", wp_);
   config().blackboard->get("Wps", wps_array_);
   config().blackboard->get("i", i);
 
