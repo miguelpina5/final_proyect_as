@@ -99,7 +99,8 @@ Por ejemplo, si un nodo detecta un escondite, puede guardar sus coordenadas en l
 
 Dentro del código `bt_nav_main.cpp`:
 
-Primero generamos los seis waypoints (escondites), están determinados en orden por la imagen del mapa.
+Primero generamos los seis waypoints (escondites).
+
 
 ```cpp
 std::vector<std::pair<double,double>> coords = {
