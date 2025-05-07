@@ -38,12 +38,21 @@ RandomWP::RandomWP(
   config().blackboard->get("node", node);
 
   coords_ = {
-    {0.53, 14.73}, {5.53, 18.79}, {17.02, 28.56},
-    {17.27, 14.28}, {23.74, 14.96}, {32.50, 19.02},
+    {0.53, 14.73},  // Escondite 1 Lado derecho lab
+    {5.53, 18.79},  // Escondite 2 Lado izquierdo lab
+    {17.02, 28.56}, // Escondite 3 Ascensor
+    {17.27, 14.28}, // Escondite 4 Circulo
+    {23.74, 14.96}, // Escondite 5 Pasillo derecha
+    {32.50, 19.02}, // Escondite 6 Fondo
   };
 
   orientation_ = {
-    {1, 0}, {1, 0}, {1, 0}, {0, 1}, {0, 1}, {0, 1}
+    {1, 0},  // Escondite 1 lado derecho lab
+    {1, 0},  // Escondite 2 lado izquierdo lab
+    {0  , 1},  // Escondite 3 Ascensor
+    {-0.72187, 0.69203}, // Escondite 4 Circulo
+    {-1, 0.0},  // Escondite 5 Pasillo derecha
+    {-0.7236, 0.6902}   // Escondite 6 Fondo
   };
 
 }
@@ -78,9 +87,9 @@ RandomWP::tick()
       ps.pose.position.y = coords_[idx].second;
       ps.pose.position.z = 0;
 
-      ps.pose.orientation.x = orientation_[idx].first;
+      ps.pose.orientation.x = 0.0;
       ps.pose.orientation.y = 0.0;
-      ps.pose.orientation.z = 0.0;
+      ps.pose.orientation.z = orientation_[idx].first;;
       ps.pose.orientation.w = orientation_[idx].second;
 
       wps_array_.poses.push_back(ps);
