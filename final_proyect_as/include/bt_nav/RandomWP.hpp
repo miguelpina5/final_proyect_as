@@ -21,33 +21,42 @@
 #include "behaviortree_cpp_v3/bt_factory.h"
 #include "nav_msgs/msg/path.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
+#include <vector>
 #include <random>
+#include <algorithm>
 
 namespace bt_nav
 {
 
-inline int random1to6_no_repeat() {
-    // Generador y device estáticos para conservar el estado
+  void fill_rec(std::vector<int> &out, int n) {
+    if (static_cast<int>(out.size()) >= n) {
+        // Caso base: ya tenemos n elementos
+        return;
+    }
+    // Generador estático para conservar estado entre llamadas
     static std::random_device rd;
     static std::mt19937 gen(rd());
-    // Pool de números disponibles
-    static std::vector<int> pool = {1,2,3,4,5,6};
 
-    // Si ya no quedan números, vuelvo a rellenar
-    if (pool.empty()) {
-        pool = {1,2,3,4,5,6};
+    // Distribución en [1, n]
+    std::uniform_int_distribution<int> dist(1, n);
+    int num = dist(gen);
+
+    // Si no está aún en 'out', lo añadimos
+    if (std::find(out.begin(), out.end(), num) == out.end()) {
+        out.push_back(num);
     }
 
-    // Elijo aleatoriamente un índice en [0, pool.size()-1]
-    std::uniform_int_distribution<size_t> dist(0, pool.size()-1);
-    size_t idx = dist(gen);
-
-    // Extraigo el valor y lo quito del pool
-    int value = pool[idx];
-    pool.erase(pool.begin() + idx);
-
-    return value;
+    // Llamada recursiva hasta tener n elementos
+    fill_rec(out, n);
 }
+
+  std::vector<int> random_unique_array(int n) {
+    std::vector<int> result;
+    result.reserve(n);
+    fill_rec(result, n);
+    return result;
+  }
+
 class RandomWP : public BT::ActionNodeBase
 {
 public:
@@ -70,6 +79,7 @@ private:
   bool first_time_;
   int jugadores_;
   size_t idx;
+  std::vector<int> random_number; 
 };
 
 }  // namespace bt_nav

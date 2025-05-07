@@ -78,10 +78,11 @@ RandomWP::tick()
   if(first_time_){
     geometry_msgs::msg::PoseStamped ps;
     wps_array_.header.frame_id = "map";
+    random_number = random_unique_array(jugadores_ + 1);
 
     for(int i = 0; i != jugadores_ + 1; i++){
       geometry_msgs::msg::PoseStamped ps;
-      idx = random1to6_no_repeat();
+      idx = random_number[i];
 
       ps.pose.position.x = coords_[idx].first;
       ps.pose.position.y = coords_[idx].second;
