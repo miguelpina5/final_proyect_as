@@ -45,13 +45,16 @@ BT::NodeStatus
 GetWaypoint::tick()
 {
   int i;
-  setOutput("way_point", wp_);
+ 
   config().blackboard->get("Wps", wps_array_);
   config().blackboard->get("i", i);
 
   wp_ = wps_array_.poses[i];  
   i++;
   config().blackboard->set<int>("i", i);
+
+  config().blackboard->set<geometry_msgs::msg::PoseStamped>("wp", wp_);
+ 
   return BT::NodeStatus::SUCCESS;
 }
 

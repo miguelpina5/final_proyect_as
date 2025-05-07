@@ -12,9 +12,9 @@
                     <ForceFailure>
                         <Sequence name="Partida">
                             <Action ID="RandomWP" players="{jugadores}"/>
-                            <Action ID="GetWaypoint" way_point="{wp}"/>
+                            <Action ID="GetWaypoint"/>
                             <RetryUntilSuccessful num_attempts="3">
-                                <Action ID="Move" way_point="{wp}"/>
+                                <Action ID="Move"/>
                             </RetryUntilSuccessful>
                             <ForceSuccess>
                                 <Action ID="DetectPersonNode" encontrados="{find_players}"/>
@@ -24,8 +24,8 @@
                 </Fallback>
             </RetryUntilSuccessful>
             <Sequence name="FinJuego">
-                <Action ID="GetWaypoint" way_point="{wp}"/>
-                <Action ID="Move" way_point="{wp}"/>
+                <Action ID="GetWaypoint"/>
+                <Action ID="Move"/>
             </Sequence>
         </Sequence>
     </BehaviorTree>
@@ -42,16 +42,12 @@
             <input_port name="encontrados"/>
             <input_port name="players"/>
         </Condition>
-        <Action ID="GetWaypoint">
-            <output_port default="{wp}" name="way_point"/>
-        </Action>
+        <Action ID="GetWaypoint"/>
         <Condition ID="IsPerson"/>
         <Action ID="Listen">
             <output_port name="listen_text"/>
         </Action>
-        <Action ID="Move">
-            <input_port name="way_point"/>
-        </Action>
+        <Action ID="Move"/>
         <Action ID="Num_jugadores">
             <input_port name="jugadores"/>
         </Action>

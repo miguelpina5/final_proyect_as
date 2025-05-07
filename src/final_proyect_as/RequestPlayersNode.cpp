@@ -14,7 +14,7 @@
 
 #include <memory>
 #include <iostream>
-
+#include <stdlib.h>
 #include "final_proyect_as/RequestPlayersNode.hpp"
 
 #include "rclcpp/node.hpp"
@@ -25,6 +25,7 @@
 
 namespace requestPlayers
 {
+  
 
 RequestPlayersNode::RequestPlayersNode(const std::string & name, const BT::NodeConfiguration & config)
 : BT::SyncActionNode(name, config)
@@ -42,7 +43,17 @@ BT::PortsList RequestPlayersNode::providedPorts()
 
 BT::NodeStatus RequestPlayersNode::tick()
 {
-  std::cout << "------";
+  system("clear");
+
+  std::cout << CYAN << R"(
+   ╔═══════════════════════════════════════════════════════════════════════════════════════════╗
+   ║ ████████  ████████  ████████  ████████  ███    ██  ██████    ████████  ████████  ████████ ║
+   ║ ███       ███       ███       ██    ██  ████   ██  ██   ██      ██        ██     ███      ║
+   ║ ██████    ████████  ███       ██    ██  ██ ██  ██  ██    ██     ██        ██     ██████   ║
+   ║ ███            ███  ███       ██    ██  ██  ██ ██  ██   ██      ██        ██     ███      ║
+   ║ ████████  ████████  ████████  ████████  ██   ████  ██████    ████████     ██     ████████ ║
+   ╚═══════════════════════════════════════════════════════════════════════════════════════════╝)" 
+   << RESET << std::endl;
 
   std::cout << "¿Cuántos jugadores van a participar? ";
   std::cin >> num_players_;

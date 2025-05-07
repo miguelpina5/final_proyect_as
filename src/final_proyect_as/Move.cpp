@@ -29,8 +29,8 @@ void
 Move::on_tick()
 {
   geometry_msgs::msg::PoseStamped goal;
-  getInput("way_point", goal);
 
+  config().blackboard->get("wp", goal);
   goal_.pose = goal;
 }
 

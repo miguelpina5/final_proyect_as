@@ -38,6 +38,10 @@ public:
 
 private:
   int num_players_;
+  const char* RESET  = "\033[0m";
+  const char* YELLOW = "\033[1;33m";
+  const char* CYAN   = "\033[1;36m";
+  const char* GREEN  = "\033[1;32m";
 };
 
 }  // namespace requestPlayers
