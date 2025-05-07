@@ -74,22 +74,23 @@ BT::PortsList DetectPersonNode::providedPorts()
 BT::NodeStatus
 DetectPersonNode::tick()
 {
-  person_detected_ = false;
+
   encontrados = 0;
 
   executor_.spin_some();  // ejecuta los callbacks pendientes
 
+  if (!person_detected_) {
+    RCLCPP_INFO(node_->get_logger(), "[BT] No se detectó persona");
+    return BT::NodeStatus::FAILURE;
+  }
+  
   config().blackboard->get("encontrados", encontrados);
   encontrados = encontrados + encontrado_yolo;
   setOutput("encontrados", encontrados);
 
-  if (person_detected_) {
-    RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);
-    return BT::NodeStatus::SUCCESS;
-  }
+  RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);
+  return BT::NodeStatus::SUCCESS;
 
-  RCLCPP_INFO(node_->get_logger(), "[BT] No se detectó persona");
-  return BT::NodeStatus::FAILURE;
 }
 
 }  // namespace detectperson

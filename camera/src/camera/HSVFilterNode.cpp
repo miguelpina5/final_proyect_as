@@ -215,7 +215,7 @@ HSVFilterNode::image_callback(const sensor_msgs::msg::Image::ConstSharedPtr & im
   }
 
   cv::Point2d point = get_detected_center(image_filtered);
-  auto [yaw, pitch] = get_detected_angles(point, model_);
+  // auto [yaw, pitch] = get_detected_angles(point, model_);
   // RCLCPP_INFO(
   //   get_logger(), "Center at pos = (%lf, %lf) angle = [%f, %f]", point.x, point.y, yaw, pitch);
   publish_detection(image, point, bbx);
