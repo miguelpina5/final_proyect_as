@@ -43,7 +43,7 @@ BT::PortsList RequestPlayersNode::providedPorts()
 
 BT::NodeStatus RequestPlayersNode::tick()
 {
-  system("clear");
+  // system("clear");
 
   std::cout << CYAN << R"(
    ╔═══════════════════════════════════════════════════════════════════════════════════════════╗
