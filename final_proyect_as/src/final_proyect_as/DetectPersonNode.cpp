@@ -48,6 +48,7 @@ namespace detectperson
   sub_ = node_->create_subscription<vision_msgs::msg::Detection2DArray>(
     "/detection_2d", 10,
     std::bind(&DetectPersonNode::detection_callback, this, _1));
+
 }
 
 void DetectPersonNode::detection_callback(
@@ -60,7 +61,10 @@ void DetectPersonNode::detection_callback(
     {
       encontrado_yolo ++;
       person_detected_ = true;
+    } else {
+      person_detected_ = false;
     }
+
   }
 }
 
@@ -74,9 +78,6 @@ BT::PortsList DetectPersonNode::providedPorts()
 BT::NodeStatus
 DetectPersonNode::tick()
 {
-
-  encontrados = 0;
-
   executor_.spin_some();  // ejecuta los callbacks pendientes
 
   if (!person_detected_) {
@@ -84,15 +85,18 @@ DetectPersonNode::tick()
     return BT::NodeStatus::FAILURE;
   }
   
-  config().blackboard->get("encontrados", encontrados);
-  encontrados = encontrados + encontrado_yolo;
-  setOutput("encontrados", encontrados);
+  config().blackboard->get("encontrados", find_players);
+  RCLCPP_INFO(node_->get_logger(), "encontrado totales antes de sumar yolo: %d", find_players);
+
+  find_players = find_players + encontrado_yolo;
+
+  RCLCPP_INFO(node_->get_logger(), "encontrado totales despues de sumar yolo: %d", find_players);
+  setOutput("encontrados", find_players);
 
   RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);
   return BT::NodeStatus::SUCCESS;
 
 }
-
 }  // namespace detectperson
 
 

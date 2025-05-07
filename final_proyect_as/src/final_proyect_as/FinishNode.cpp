@@ -45,16 +45,18 @@ BT::NodeStatus FinishNode::tick()
   int num_players_;
   int find_players;
   int i;
+  int escondites = num_players_ + 1;
   nav_msgs::msg::Path wps_array_;
+  
 
   getInput("players", num_players_);
   getInput("encontrados", find_players);
   config().blackboard->get("i", i);
   config().blackboard->get("Wps", wps_array_);
+  
+  std::cout << "Jugadores: " << num_players_ << "\nEncontrados hasta el momento: " << find_players << std::endl;
 
-  std::cout << "Jugadores: " << num_players_ << "\nEncontrados: " << find_players << std::endl;
-
-  if (find_players == num_players_) {
+  if (find_players == num_players_ || escondites == i) {
     std::cout << "Todos los jugadores han sido encontrados." << std::endl;
     i = 0;
 
@@ -66,17 +68,18 @@ BT::NodeStatus FinishNode::tick()
 
     ps.pose.orientation.x = 0.0;
     ps.pose.orientation.y = 0.0;
-    ps.pose.orientation.z = 0.0;
-    ps.pose.orientation.w = 1.0;
-
+    ps.pose.orientation.z = 1;
+    ps.pose.orientation.w = 0;
     wps_array_.poses[i] = ps;
     
     config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
     config().blackboard->set<int>("i", i);
+    std::cout << "enviado bien" << std::endl;
     return BT::NodeStatus::SUCCESS;
-  }
 
-  return BT::NodeStatus::FAILURE;
+  } else {
+    return BT::NodeStatus::FAILURE;
+  }
 }
 
 }  // namespace finish

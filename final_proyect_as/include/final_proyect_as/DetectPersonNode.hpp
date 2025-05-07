@@ -50,8 +50,8 @@ private:
   rclcpp::Subscription<vision_msgs::msg::Detection2DArray>::SharedPtr sub_;
   rclcpp::executors::SingleThreadedExecutor executor_;
   bool person_detected_;
-  int encontrados;
   int encontrado_yolo;
+  int find_players;
 };
 
 }  // namespace detectperson
