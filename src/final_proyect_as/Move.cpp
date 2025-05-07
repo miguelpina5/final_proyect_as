@@ -30,7 +30,12 @@ Move::on_tick()
 {
   geometry_msgs::msg::PoseStamped goal;
 
+
   config().blackboard->get("wp", goal);
+  
+  goal.header.frame_id = "map";  
+  goal.header.stamp = node_->get_clock()->now();
+
   goal_.pose = goal;
 }
 
