@@ -25,6 +25,9 @@
 #include <random>
 #include <algorithm>
 
+
+#define N_ESCONDITES 6
+
 namespace bt_nav
 {
 
@@ -38,7 +41,7 @@ namespace bt_nav
     static std::mt19937 gen(rd());
 
     // Distribución en [1, n]
-    std::uniform_int_distribution<int> dist(1, n);
+    std::uniform_int_distribution<int> dist(1, N_ESCONDITES);
     int num = dist(gen);
 
     // Si no está aún en 'out', lo añadimos
@@ -63,7 +66,7 @@ public:
   explicit RandomWP(
     const std::string & xml_tag_name,
     const BT::NodeConfiguration & conf);
-
+    
     std::vector<std::pair<double,double>> coords_;
     std::vector<std::pair<double,double>> orientation_;
     
