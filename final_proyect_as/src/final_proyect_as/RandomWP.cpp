@@ -92,7 +92,7 @@ RandomWP::tick()
       ps.pose.orientation.y = 0.0;
       ps.pose.orientation.z = orientation_[idx].first;;
       ps.pose.orientation.w = orientation_[idx].second;
-
+      std::cout << "Indice a buscar: " << idx << std::endl;
       wps_array_.poses.push_back(ps);
     }
 
