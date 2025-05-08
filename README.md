@@ -58,7 +58,7 @@ ros2 run nav2_mao_server map_saver_cli
 
 Este último comando nos generará un archivo `.yaml` que será el que lanzaremos más adelante para utilizar el mapa y otro archivo `.pgm` que podremos editar con herramientas como `gimp` para limpiar el ruido generado.
 
-![Mapa universidad](./img/mapa.png)
+![Mapa universidad](./img/mapa5.png)
 
 ## 3. Behaviour Tree
 Un Behaviour Tree (árbol de comportamiento) es una estructura de control que organiza decisiones y acciones en forma jerárquica, permitiendo que un robot ejecute comportamientos complejos de manera modular y flexible. Cada nodo representa una acción o una condición, y el árbol se recorre para decidir qué hacer en cada momento.
