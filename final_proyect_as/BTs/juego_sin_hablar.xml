@@ -13,7 +13,7 @@
                         <Sequence name="Partida">
                             <Action ID="RandomWP" players="{jugadores}"/>
                             <Action ID="GetWaypoint"/>
-                            <RetryUntilSuccessful num_attempts="3">
+                            <RetryUntilSuccessful num_attempts="10">
                                 <Action ID="Move"/>
                             </RetryUntilSuccessful>
                             <ForceSuccess>
