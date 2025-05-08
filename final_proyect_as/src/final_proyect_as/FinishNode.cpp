@@ -74,8 +74,8 @@ BT::NodeStatus FinishNode::tick()
 
     ps.pose.orientation.x = 0.0;
     ps.pose.orientation.y = 0.0;
-    ps.pose.orientation.z = 1;
-    ps.pose.orientation.w = 0;
+    ps.pose.orientation.z = -0.7;
+    ps.pose.orientation.w = 0.7;
     wps_array_.poses[i] = ps;
     
     config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
