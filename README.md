@@ -91,74 +91,82 @@ Groot nos permite diseñar visualmente el árbol de comportamiento y luego expor
 
 ## 4. Navegación y WayPoints
 
-Navegar con waypoints consiste en mover un robot a través de una serie de puntos de referencia predefinidos (coordenadas) en un mapa. Cada waypoint representa una posición a la que el robot debe llegar siguiendo una ruta planificada.
+La navegación consiste en guiar a un robot a través de su entorno para alcanzar uno o varios objetivos, evitando obstáculos y manteniendo una trayectoria segura. Uno de los enfoques comunes para lograr esto es mediante el uso de waypoints, que son puntos de referencia espaciales (con posición y orientación) que el robot debe visitar.
 
-En el contexto de los behavior trees, una blackboard es una memoria compartida donde los nodos del árbol pueden leer y escribir información. Funciona como una base de datos temporal que permite que diferentes partes del árbol se comuniquen entre sí sin necesidad de estar conectadas directamente.
+En el contexto de un sistema de comportamiento basado en Behavior Trees y ROS 2, se implementan distintos nodos que cooperan para planificar y ejecutar la navegación. A continuación explicaremos tres nodos clave: `RandomWP`, `GetWaypoint` y `Move`.
 
-Por ejemplo, si un nodo detecta un escondite, puede guardar sus coordenadas en la blackboard, y otro nodo, encargado de moverse, puede leer esa información para navegar hasta allí.
+### RandomWP: generación de waypoints aleatorios
 
-Dentro del código `bt_nav_main.cpp`:
-
-Primero generamos los seis waypoints (escondites), están determinados en orden por la imagen del mapa.
-
+El nodo `RandomWP` se encarga de generar una lista de waypoints aleatorios, que serán utilizados por el robot para navegar hacia ubicaciones de interés. Estos puntos están predefinidos como coordenadas reales dentro del entorno y se eligen de forma aleatoria para simular exploración o búsqueda.
 ```cpp
-std::vector<std::pair<double,double>> coords = {
-    {0.53,  14.73},
-    {5.53,  18.79},
+ coords_ = {
+    {0.53, 14.73},
+    {5.53, 18.79},
     {17.02, 28.56},
-    {17.27, 14.28},
+    {17.06, 14.07},
     {23.74, 14.96},
-    {32.50, 19.02}
+    {32.50, 19.02},
   };
 ```
-Gestionamos el número de jugadores que pueden jugar (mínimo 1 y máximo 5 porque hay 6 escondites).
 
+Estas coordenadas son en orden, los lugares señalados en rojo en el apartado de [Creación del mapa](#creacion-del-mapa).
+
+Durante el primer tick, se genera un conjunto aleatorio de posiciones y orientaciones con:
 ```cpp
-if (n_jugadores < 1 || n_jugadores > 5) {
-    RCLCPP_ERROR(node->get_logger(), "Número de jugadores fuera de rango [1-5]");
-    return 1;
-  }
+random_number = random_unique_array(jugadores_ + 1);
+```
+Por cada jugador (más uno), se crea una estructura `PoseStamped` que contiene tanto la posición como la orientación del robot:
+```cpp
+ps.pose.position.x = coords_[idx].first;
+ps.pose.orientation.z = orientation_[idx].first;
 ```
 
-Una vez tenemos los 6 waypoints, se mezclan aleatoriamente usando C++ para seleccionar los escondites. Para ello, se utiliza una fuente de aleatoriedad `(std::random_device)` y un generador de números aleatorios `(std::mt19937)` inicializado con dicha fuente. A continuación, se aplica `std::shuffle` al vector `coords`, que contiene las coordenadas de los posibles escondites, para desordenarlas de forma aleatoria. Finalmente, se seleccionan tantas posiciones como jugadores haya, más una adicional, asegurándose de no exceder el número total de coordenadas disponibles. Estas ubicaciones serán los escondites que el Kobuki recorrerá para buscar a los jugadores escondidos.
+Las orientaciones del Kobuki en cada uno de los escondites se ha calculado usando cuateniones con la siguiente fórmula donde cada una de las coordenadas corresponde a x, y, z, w.
+
+![Fórmula cuaterniones](./img/formula.jpeg)
 
 ```cpp
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::shuffle(coords.begin(), coords.end(), gen);
-  int sitios = std::min(static_cast<int>(coords.size()), n_jugadores + 1);
+orientation_ = {
+    {1, 0},
+    {1, 0},
+    {0, 1},
+    {-0.73624, 0.67672},
+    {-1, 0.0},
+    {-0.7236, 0.6902}
+  };
 ```
-
-Este fragmento de código recorre una lista de waypoints y hace que el robot los visite uno por uno. Para cada waypoint:
-
-1. Lo publica en el blackboard (una memoria compartida usada por el árbol de comportamiento) y muestra por consola su posición.
+Todos estos puntos se almacenan en un nav_msgs::msg::Path y se guardan en la blackboard bajo la clave "Wps" para su uso posterior:
 ```cpp
-  for (size_t i = 0; i < waypoints.size() && rclcpp::ok(); ++i) {
-    blackboard->set("waypoint", waypoints[i]);
-    RCLCPP_INFO(node->get_logger(), "[Main] Enviando waypoint %zu: x=%.2f, y=%.2f", 
-                i+1, 
-                waypoints[i].pose.position.x, 
-                waypoints[i].pose.position.y);
+config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
 ```
+### Nodo GetWaypoint: selección secuencial de waypoints
 
-2. Ejecuta el árbol de comportamiento en bucle hasta que se complete la tarea asociada a ese waypoint.
+El nodo GetWaypoint se encarga de extraer uno por uno los waypoints generados previamente por `RandomWP`. Cada vez que se ejecuta un tick, este nodo obtiene el índice actual `i` desde la *blackboard* y extrae el waypoint correspondiente:
 ```cpp
-    bool finish = false;
-    while (rclcpp::ok() && !finish) {
-      rclcpp::spin_some(node);
-      finish = tree.rootNode()->executeTick() != BT::NodeStatus::RUNNING;
-      rate.sleep();
-    }
+wp_ = wps_array_.poses[i];  
+i++;
 ```
-
-3. Una vez alcanzado, espera 2 segundos antes de pasar al siguiente.
+Después, guarda ese waypoint específico bajo la clave "wp", para que el nodo de movimiento lo utilice:
 ```cpp
-    RCLCPP_INFO(node->get_logger(), "[Main] Esperando 2 segundos en el sitio...");
-    rclcpp::sleep_for(std::chrono::seconds(2));
-  }
+config().blackboard->set<geometry_msgs::msg::PoseStamped>("wp", wp_);
 ```
+Esto permite al árbol de comportamiento enviar al robot hacia el siguiente destino en una secuencia ordenada.
 
-Este ciclo continúa hasta que el robot haya recorrido todos los waypoints o hasta que el nodo de ROS se detenga. Una vez completado el recorrido, la navegación finaliza en la puerta del laboratorio, que corresponde al punto de inicio del juego y, por tanto, al origen del robot.
+### Nodo Move: ejecución de navegación
+
+El nodo Move es el encargado de realizar la navegación real hacia un waypoint utilizando la acción `navigate_to_pose` del stack de navegación de ROS 2 (nav2). Es un nodo de acción que, al hacer tick, lee el destino desde la blackboard:
+```cpp
+config().blackboard->get("wp", goal);
+```
+Ajusta el `timestamp` y el marco de referencia:
+```cpp
+goal.header.frame_id = "map";  
+goal.header.stamp = node_->get_clock()->now();
+```
+Y lanza la acción para que el robot comience a moverse hacia el punto indicado. Si la navegación tiene éxito, registra un mensaje:
+```cpp
+RCLCPP_INFO(node_->get_logger(), "** NAVIGATION SUCCEEDED **");
+```
 
 ## 5. Yolo
 YOLO en ROS 2 es la integración de un modelo de detección de objetos en tiempo real dentro del sistema robótico ROS 2. YOLO utiliza redes neuronales para identificar y localizar múltiples objetos en una imagen con gran velocidad y precisión. En el contexto de ROS 2, se implementa como un nodo que recibe imágenes de una cámara (por ejemplo, desde el topic `/color/image_raw)`, procesa cada fotograma mediante el modelo YOLO y publica los resultados (como las clases detectadas, coordenadas de los objetos y niveles de confianza) en topics como `/yolo/detections`. Esta información es utilizada por otros nodos del robot para tareas como navegación, manipulación o interacción con el entorno.
@@ -196,11 +204,114 @@ detection_pub_->publish(detection_array_msg);
 
 ### Detect Person Node
 
-gayyyyyyy
+El nodo `DetectPersonNode`, parte del sistema de comportamiento implementado con Behavior Trees y ROS 2, se encarga de detectar personas a través de mensajes provenientes de un detector basado en YOLO. El objetivo principal es procesar las detecciones visuales en cada ciclo de ejecución (tick), identificar si hay personas presentes en la escena y actualizar dicha información en la blackboard compartida del árbol de comportamiento.
+
+La clase se define como un nodo de acción sincrónica:
+
+```cpp
+DetectPersonNode::DetectPersonNode(
+  const std::string & name,
+  const BT::NodeConfiguration & config)
+: BT::SyncActionNode(name, config),
+  person_detected_(false)
+```
+
+Aquí se inicializa el nodo como una acción sincrónica (SyncActionNode) y se establece un indicador (person_detected_) que se actualizará más adelante si se detecta una persona.
+
+Uno de los aspectos más importantes es la suscripción al topic `/detection_2d`, que entrega mensajes del tipo `vision_msgs::msg::Detection2DArray`. Esta suscripción permite recibir los resultados del modelo `YOLO` que se ejecuta en otro nodo:
+```cpp
+sub_ = node_->create_subscription<vision_msgs::msg::Detection2DArray>(
+  "/detection_2d", 10,
+  std::bind(&DetectPersonNode::detection_callback, this, _1));
+```
+Cuando se reciben nuevos datos, se llama a `detection_callback`, donde se analiza cada detección para verificar si el objeto detectado tiene una `class_id` igual a *person*:
+```cpp
+void DetectPersonNode::detection_callback(
+  const vision_msgs::msg::Detection2DArray::SharedPtr msg)
+{
+  encontrado_yolo = 0;
+  for (const auto & detection : msg->detections) {
+    if (!detection.results.empty() &&
+        detection.results[0].hypothesis.class_id == "person")
+    {
+      encontrado_yolo ++;
+      person_detected_ = true;
+    } else {
+      person_detected_ = false;
+    }
+  }
+}
+```
+Esta función transforma la información visual en una representación interna (aquí simplemente un contador), sumando cuántas personas se detectaron. La variable `encontrado_yolo` guarda ese número temporalmente. Si se detecta al menos una persona, se activa el flag `person_detected_`.
+
+Durante cada tick del árbol de comportamiento, se ejecutan los callbacks pendientes mediante:
+```cpp
+executor_.spin_some();  // ejecuta los callbacks pendientes
+```
+Luego, si no se ha detectado ninguna persona, se informa el fallo:
+```cpp
+if (!person_detected_) {
+  RCLCPP_INFO(node_->get_logger(), "[BT] No se detectó persona");
+  return BT::NodeStatus::FAILURE;
+}
+```
+Si se detectaron personas, el nodo lee la variable acumulada encontrados desde la blackboard, suma los nuevos hallazgos y vuelve a escribir el resultado en la misma:
+```cpp
+config().blackboard->get("encontrados", find_players);
+
+find_players = find_players + encontrado_yolo;
+setOutput("encontrados", find_players);
+```
+Finalmente, el nodo retorna `SUCCESS`, indicando que el procesamiento fue exitoso, y registra por consola cuántas personas detectó en este tick:
+```cpp
+RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);
+return BT::NodeStatus::SUCCESS;
+```
+
 
 ## 6. Sistema de diálogo
 
-aqui lo de hablar si podemo shacerlo al final
+Para permitir que el robot Kobuki sea capaz de hablar e interactuar mediante voz, hemos incorporado capacidades de Interacción Humano-Robot (HRI), centradas en el uso de comandos de voz y respuestas habladas. Estas capacidades permiten que el robot entienda ciertas órdenes vocales y responda mediante síntesis de voz, facilitando una comunicación más natural con el usuario.
+
+En nuestro caso hemos utilizado un enfoque directo basado en HRI para dotar al robot de esta funcionalidad básica, existen soluciones más avanzadas y completas para el procesamiento del lenguaje natural, como `Dialogflow` de Google.
+
+Para dotar al robot Kobuki de la capacidad de hablar e interactuar verbalmente con el usuario, implementamos e integramos el nodo `Speak`, parte del paquete `hri_bt_nodes`, dentro de nuestro árbol de comportamiento (BT). Este nodo permite generar respuestas por voz utilizando el sistema de texto a voz (TTS) definido en `audio_common_msgs::action::TTS`.
+
+El nodo Speak extiende la clase `BtActionNode`, especializada en lanzar acciones ROS 2 dentro de un BT. En su constructor se inicializan dos publishers:
+```cpp
+speech_text_publisher_ = node_->create_publisher<std_msgs::msg::String>("speech_text", 10);
+speech_start_publisher_ = node_->create_publisher<std_msgs::msg::Int8>("dialog_phase", 10);
+```
+Estos publishers permiten que el sistema publique el texto que debe pronunciarse, así como una señal para indicar el inicio de la fase de diálogo. La publicación se activa durante el `on_tick`, donde también se procesan los parámetros del texto a pronunciar:
+```cpp
+getInput("speech_text", text);
+getInput("params", sparams);
+text = swap_placeholders(text, params);
+```
+El método `swap_placeholders` reemplaza marcadores en el texto ([] por defecto) con parámetros dinámicos, permitiendo que las frases pronunciadas se adapten al contexto.
+
+Finalmente, el nodo envía el objetivo (goal) con el texto final:
+```cpp
+goal_.text = text;
+```
+Y publica el mensaje correspondiente para activar la reproducción de voz:
+```cpp
+speech_text_publisher_->publish(speech_text_msg_);
+speech_start_publisher_->publish(speech_start_msg_);
+```
+### Integración en el sistema BT
+
+Este nodo fue registrado y cargado dinámicamente a través del archivo `main_hri.cpp`, donde se declara el nodo `hri_node` y se configuran sus transiciones de ciclo de vida (configure y activate). El archivo XML con el árbol de comportamiento se carga desde el parámetro `bt_xml_file`, y los plugins BT (como Speak) se registran dinámicamente:
+```cpp
+factory.registerFromPlugin(loader.getOSName(plugin));
+```
+Esto permite que `Speak` esté disponible como un nodo de acción reutilizable dentro del árbol, y que pueda ser invocado cuando se requiera una interacción verbal por parte del robot.
+
+### Observación
+
+Dentro del paquete de interacción vocal, existen cuatro nodos principales diseñados para la comunicación entre el usuario y el robot: `Speak`, `Listen`, `Query` y `DialogConfirm`. De estos, hemos utilizado únicamente el nodo `Speak`, que permite que el robot hable y emita mensajes de voz hacia el usuario.
+
+Sin embargo, no se integraron los nodos `Listen`, `Query` ni `DialogConfirm` en el árbol de comportamiento final. La razón principal es que el nodo `Listen`, encargado de captar las respuestas del usuario, no se implementó, lo que imposibilitó el uso efectivo de `Query`, que depende de esa entrada para almacenar valores en la *blackboard*, ni de `DialogConfirm`, que requiere la verificación de respuestas verbales del usuario. Dado que la funcionalidad de recepción de voz no estaba operativa, decidimos centrarnos únicamente en la salida de voz del robot, usando `Speak` como única forma de interacción verbal en este proyecto.
 
 ## 7. Demostración
 
