@@ -2,14 +2,14 @@
 ### Carla García Alejandre, Elías Muñoz Taín, Miguel Ángel Piña Martínez y María Yagüe LLamas
 
 ## 1. Introducción
-Este proyecto plantea el desarrollo de un juego interactivo de escondite utilizando un **Kobuki**. La propuesta consiste en mapear un aula como espacio de juego y delimitar seis escondites fijos empleando los corchos disponibles en el laboratorio. Durante cada partida, varios jugadores se ocultarán en esos puntos predefinidos mientras el Kobuki los busca.  
+Este proyecto plantea el desarrollo de un juego interactivo de escondite utilizando un **Kobuki**. La propuesta consiste en mapear un aula como espacio de juego y delimitar cinco escondites fijos empleando los corchos disponibles en el laboratorio. Durante cada partida, varios jugadores se ocultarán en esos puntos predefinidos mientras el Kobuki los busca.  
 
 El robot dispondrá de un número de intentos igual al número de jugadores más uno para localizar a todos los participantes. Para ello, se integrará el modelo de visión por computador `YOLO`, que permitirá al Kobuki detectar la presencia de personas en cada escondite y llevar un registro del número de jugadores encontrados.  
 
-Además, se prevé incorporar un sistema de diálogo para dotar al Kobuki de una interacción verbal básica: contará en voz alta al inicio del juego, reaccionará cuando detecte a un jugador y anunciará el resultado final. Si el robot logra encontrar a todos los jugadores antes de agotar sus intentos, ganará la partida; en caso contrario, la victoria será para los jugadores.  
+Además, se prevé incorporar un sistema de diálogo para dotar al Kobuki de una interacción verbal básica: contará en voz alta al inicio del juego, reaccionará cuando detecte a un jugador y anunciará el resultado final. Si el robot logra encontrar a todos los jugadores antes de agotar sus intentos, ganará la partida. En caso contrario, la victoria será para los jugadores.  
 
 ## 2. Espacio de juego
-Hemos realizado el mapeo del pasillo de los laboratorios de la universidad para delimitar seis escondites. Utilizamos un robot `Kobuki` ejecutando ROS 2, que recorrió el pasillo recogiendo datos con sus sensores.
+Hemos realizado el mapeo del pasillo de los laboratorios de la universidad para delimitar cinco escondites. Utilizamos un robot `Kobuki` ejecutando ROS 2, que recorrió el pasillo recogiendo datos con sus sensores.
 
 ### Creación del mapa
 Para generar el mapa, utilizamos el sistema de navegación `nav2`. En terminales diferentes, se lanzan los isguientes comandos.
@@ -38,7 +38,7 @@ ros2 launch slam_toolbox online_async_launch.py params_file:=src/kobuki/config/k
 
 **Mapa**
 
-Lanzamos un nodo que se suscribirá a `/map` el cual uardará en disco cuando se solicite el mapa que se está generando.
+Lanzamos un nodo que se suscribirá a `/map` el cual guarda en disco cuando se solicite el mapa que se está generando.
 
 ```bash
 ros2 launch nav2_map_server map_saver_server.launch.py
@@ -50,13 +50,13 @@ Controlamos al robot mediante teleoperación mientras visualizamos el proceso en
 ros2 run teleop_twist_keyboard teleop_twist_keyboard
 ```
 
-Una vez obtenido el mapa, lo guardaremos:
+Una vez obtenido el mapa, lo guardamos:
 
 ```bash
 ros2 run nav2_mao_server map_saver_cli
 ```
 
-Este último comando nos generará un archivo `.yaml` que será el que lanzaremos más adelante para utilizar el mapa y otro archivo `.pgm` que podremos editar con herramientas como `gimp` para limpiar el ruido generado.
+Este último comando nos genera un archivo `.yaml` que será el que lanzaremos más adelante para utilizar el mapa y otro archivo `.pgm` que podremos editar con herramientas como `gimp` para limpiar el ruido generado.
 
 ![Mapa universidad](./img/mapa5.png)
 
@@ -91,7 +91,7 @@ Groot nos permite diseñar visualmente el árbol de comportamiento y luego expor
 
 ## 4. Navegación y WayPoints
 
-La navegación consiste en guiar a un robot a través de su entorno para alcanzar uno o varios objetivos, evitando obstáculos y manteniendo una trayectoria segura. Uno de los enfoques comunes para lograr esto es mediante el uso de waypoints, que son puntos de referencia espaciales (con posición y orientación) que el robot debe visitar.
+La navegación consiste en guiar a un robot a través de su entorno para alcanzar uno o varios objetivos, evitando obstáculos y manteniendo una trayectoria segura. Uno de los enfoques comunes para lograr esto es mediante el uso de WayPoints, que son puntos de referencia espaciales (con posición y orientación) que el robot debe visitar.
 
 En el contexto de un sistema de comportamiento basado en Behavior Trees y ROS 2, se implementan distintos nodos que cooperan para planificar y ejecutar la navegación. A continuación explicaremos tres nodos clave: `RandomWP`, `GetWaypoint` y `Move`.
 
@@ -121,7 +121,7 @@ ps.pose.position.x = coords_[idx].first;
 ps.pose.orientation.z = orientation_[idx].first;
 ```
 
-Las orientaciones del Kobuki en cada uno de los escondites se ha calculado usando cuateniones con la siguiente fórmula donde cada una de las coordenadas corresponde a x, y, z, w.
+Las orientaciones del Kobuki en cada uno de los escondites se ha calculado usando cuaterniones con la siguiente fórmula donde cada una de las coordenadas corresponde a x, y, z, w.
 
 ![Fórmula cuaterniones](./img/formula.jpeg)
 
@@ -135,18 +135,18 @@ orientation_ = {
     {-0.7236, 0.6902}
   };
 ```
-Todos estos puntos se almacenan en un nav_msgs::msg::Path y se guardan en la blackboard bajo la clave "Wps" para su uso posterior:
+Todos estos puntos se almacenan en un `nav_msgs::msg::Path` y se guardan en la blackboard bajo la clave "Wps" para su uso posterior:
 ```cpp
 config().blackboard->set<nav_msgs::msg::Path>("Wps", wps_array_);
 ```
 ### Nodo GetWaypoint: selección secuencial de waypoints
 
-El nodo GetWaypoint se encarga de extraer uno por uno los waypoints generados previamente por `RandomWP`. Cada vez que se ejecuta un tick, este nodo obtiene el índice actual `i` desde la *blackboard* y extrae el waypoint correspondiente:
+El nodo GetWaypoint se encarga de extraer uno por uno los WayPoints generados previamente por `RandomWP`. Cada vez que se ejecuta un tick, este nodo obtiene el índice actual `i` desde la *blackboard* y extrae el WayPoint correspondiente:
 ```cpp
 wp_ = wps_array_.poses[i];  
 i++;
 ```
-Después, guarda ese waypoint específico bajo la clave "wp", para que el nodo de movimiento lo utilice:
+Después, guarda ese WayPoint específico bajo la clave "wp", para que el nodo de movimiento lo utilice:
 ```cpp
 config().blackboard->set<geometry_msgs::msg::PoseStamped>("wp", wp_);
 ```
@@ -316,5 +316,3 @@ Sin embargo, no se integraron los nodos `Listen`, `Query` ni `DialogConfirm` en 
 ## 7. Demostración
 
 A continuación se presenta un vídeo con la demostración del proyecto *El Escondite*, simulando una partida real. En esta grabación se pueden observar tanto el funcionamiento del sistema como la dinámica del juego en un entorno controlado.
-
-[Odio a juancams]
