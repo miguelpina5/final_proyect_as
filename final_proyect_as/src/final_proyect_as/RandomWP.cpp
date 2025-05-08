@@ -43,7 +43,6 @@ RandomWP::RandomWP(
     {17.02, 28.56}, // Escondite 3 Ascensor
     {17.06, 14.07}, // Escondite 4 Circulo
     {23.74, 14.96}, // Escondite 5 Pasillo derecha
-    {32.50, 19.02}, // Escondite 6 Fondo
   };
 
   orientation_ = {
@@ -52,7 +51,6 @@ RandomWP::RandomWP(
     {0  , 1},  // Escondite 3 Ascensor
     {-0.73624, 0.67672}, // Escondite 4 Circulo
     {-1, 0.0},  // Escondite 5 Pasillo derecha
-    {-0.7236, 0.6902}   // Escondite 6 Fondo
   };
 
 }

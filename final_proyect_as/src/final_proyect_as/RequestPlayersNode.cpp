@@ -58,7 +58,7 @@ BT::NodeStatus RequestPlayersNode::tick()
   std::cout << "¿Cuántos jugadores van a participar? ";
   std::cin >> num_players_;
 
-  if (num_players_ <= 0 || num_players_ > 5) {
+  if (num_players_ <= 0 || num_players_ > 4) {
     std::cerr << "Número no válido. Tiene q haber mínimo 1 jugador y máximo 5" << std::endl;
     return BT::NodeStatus::FAILURE;
   }
