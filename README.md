@@ -185,7 +185,7 @@ El nodo se declara con `: Node("darkent_detection_node")`, lo que indica que su 
 
 Esto significa que el nodo recibirá las detecciones del modelo YOLO, que vienen en un formato personalizado con información como clase, puntuación y caja delimitadora.
 
-Cuando se recibe un mensaje, se ejecuta el método detection_callback, donde se crea un nuevo mensaje del tipo vision_msgs::msg::Detection2DArray, un formato estándar en ROS 2:
+Cuando se recibe un mensaje, se ejecuta el método detection_callback, donde se crea un nuevo mensaje del tipo `vision_msgs::msg::Detection2DArray`, un formato estándar en ROS 2:
 
 ```cpp
 vision_msgs::msg::Detection2DArray detection_array_msg;
