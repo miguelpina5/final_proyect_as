@@ -26,7 +26,7 @@
 #include <algorithm>
 
 
-#define N_ESCONDITES 3
+#define N_ESCONDITES 6
 
 namespace bt_nav
 {
