@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence name="Control">
+            <RetryUntilSuccessful num_attempts="10">
+                <Sequence name="Configuración">
+                    <Action ID="speak" say_text="¿Cuántos jugadores sois?"/>
+                    <Action ID="Listen" listen_text="{understood}"/>
+                    <Action ID="Query" Intention="Jugadores" intention_value="{num_jugadores}" text="[understood}"/>
+                    <Action ID="DialogConfirmation" prompt="¿Has dicho {num_jugadores}?"/>
+                </Sequence>
+            </RetryUntilSuccessful>
+            <RetryUntilSuccessful num_attempts="{num_jugadores} + 1">
+                <Fallback name="Jugar">
+                    <Condition ID="Finish"/>
+                    <ForceFailure>
+                        <Sequence name="Partida">
+                            <Action ID="GetWP" WayPoint="{wp}"/>
+                            <RetryUntilSuccessful num_attempts="10">
+                                <Action ID="Navegar" goal="{wp}"/>
+                            </RetryUntilSuccessful>
+                            <ForceSuccess>
+                                <Sequence name="Comprobar">
+                                    <Condition ID="IsPerson"/>
+                                    <Action ID="speak" say_text="¿Cuál es tu nombre?"/>
+                                    <Action ID="Listen" listen_text="{understood}"/>
+                                    <Action ID="Query" Intention="nombre" intention_value="{name_jugador}" text="{understood}"/>
+                                    <Action ID="DialogConfirmation" prompt="¿Eres {name_jugador}"/>
+                                </Sequence>
+                            </ForceSuccess>
+                        </Sequence>
+                    </ForceFailure>
+                </Fallback>
+            </RetryUntilSuccessful>
+            <Sequence name="FinJuego">
+                <Action ID="GetWP" WayPoint="{origin}"/>
+                <Action ID="Navegar" goal="{origin}"/>
+                <Action ID="Speak"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="AñadirPerson"/>
+        <Action ID="Configuración"/>
+        <Action ID="DialogConfirmation">
+            <input_port name="prompt"/>
+        </Action>
+        <Condition ID="Finish"/>
+        <Action ID="GetWP">
+            <output_port name="WayPoint"/>
+        </Action>
+        <Condition ID="IsPerson"/>
+        <Action ID="Listen">
+            <output_port name="listen_text"/>
+        </Action>
+        <Action ID="Move">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="Navegar">
+            <input_port name="goal"/>
+        </Action>
+        <Action ID="Query">
+            <input_port name="Intention"/>
+            <output_port name="intention_value"/>
+            <input_port name="text"/>
+        </Action>
+        <Action ID="Speak"/>
+        <Action ID="speak">
+            <input_port name="say_text"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
