@@ -2,14 +2,12 @@
 ### Carla García Alejandre, Elías Muñoz Taín, Miguel Ángel Piña Martínez y María Yagüe LLamas
 
 ## 1. Introducción
-Este proyecto plantea el desarrollo de un juego interactivo de escondite utilizando un **Kobuki**. La propuesta consiste en mapear un aula como espacio de juego y delimitar cinco escondites fijos empleando los corchos disponibles en el laboratorio. Durante cada partida, varios jugadores se ocultarán en esos puntos predefinidos mientras el Kobuki los busca.  
+Este proyecto plantea el desarrollo de un juego interactivo de escondite utilizando un **Kobuki**. La propuesta consiste en mapear un aula como espacio de juego y delimitar seis escondites fijos empleando los corchos disponibles en el laboratorio. Durante cada partida, varios jugadores se ocultarán en esos puntos predefinidos mientras el Kobuki los busca.  
 
 El robot dispondrá de un número de intentos igual al número de jugadores más uno para localizar a todos los participantes. Para ello, se integrará el modelo de visión por computador `YOLO`, que permitirá al Kobuki detectar la presencia de personas en cada escondite y llevar un registro del número de jugadores encontrados.  
 
-Además, se prevé incorporar un sistema de diálogo para dotar al Kobuki de una interacción verbal básica: contará en voz alta al inicio del juego, reaccionará cuando detecte a un jugador y anunciará el resultado final. Si el robot logra encontrar a todos los jugadores antes de agotar sus intentos, ganará la partida. En caso contrario, la victoria será para los jugadores.  
-
 ## 2. Espacio de juego
-Hemos realizado el mapeo del pasillo de los laboratorios de la universidad para delimitar cinco escondites. Utilizamos un robot `Kobuki` ejecutando ROS 2, que recorrió el pasillo recogiendo datos con sus sensores.
+Hemos realizado el mapeo del pasillo de los laboratorios de la universidad para delimitar seis escondites. Utilizamos un robot `Kobuki` ejecutando ROS 2, que recorrió el pasillo recogiendo datos con sus sensores.
 
 ### Creación del mapa
 Para generar el mapa, utilizamos el sistema de navegación `nav2`. En terminales diferentes, se lanzan los isguientes comandos.
@@ -58,7 +56,7 @@ ros2 run nav2_mao_server map_saver_cli
 
 Este último comando nos genera un archivo `.yaml` que será el que lanzaremos más adelante para utilizar el mapa y otro archivo `.pgm` que podremos editar con herramientas como `gimp` para limpiar el ruido generado.
 
-![Mapa universidad](./img/mapa5.png)
+![Mapa universidad](./img/mapa.png)
 
 ## 3. Behaviour Tree
 Un Behaviour Tree (árbol de comportamiento) es una estructura de control que organiza decisiones y acciones en forma jerárquica, permitiendo que un robot ejecute comportamientos complejos de manera modular y flexible. Cada nodo representa una acción o una condición, y el árbol se recorre para decidir qué hacer en cada momento.
@@ -73,7 +71,7 @@ ros2 run groot Groot
 
 Este es nuestro BT final, el cual representa la lógica completa del juego del escondite.
 
-![Behaviour Tree Final](./img/bt_final.png)
+![Behaviour Tree Final](./img/bt_final.jpeg)
 
 Sin embargo, durante el desarrollo fue necesario dividir el árbol en varios subárboles más pequeños para poder probar cada comportamiento por separado y asegurarnos de que todo funcionaba correctamente paso a paso.
 
@@ -81,9 +79,7 @@ Por ejemplo un BT para probar la navegación del robot hacia waypoints.
 
 ![Behaviour Tree Navegación](./img/bt_nav2.png)
 
-O una prueba del escondite funcional sin diálogo.
-
-![Behaviour Tree Sin Diálogo](./img/bt_sin_dialogo.png)
+![Behaviour Tree sin Rand](./img/bt_sin_dialogo.png)
 
 Esta estrategia nos permitió detectar errores fácilmente y validar el funcionamiento de cada parte antes de integrarlas en el árbol completo.
 
@@ -268,51 +264,9 @@ RCLCPP_INFO(node_->get_logger(), "[BT] Persona detectada: %d", encontrado_yolo);
 return BT::NodeStatus::SUCCESS;
 ```
 
-
-## 6. Sistema de diálogo
-
-Para permitir que el robot Kobuki sea capaz de hablar e interactuar mediante voz, hemos incorporado capacidades de Interacción Humano-Robot (HRI), centradas en el uso de comandos de voz y respuestas habladas. Estas capacidades permiten que el robot entienda ciertas órdenes vocales y responda mediante síntesis de voz, facilitando una comunicación más natural con el usuario.
-
-En nuestro caso hemos utilizado un enfoque directo basado en HRI para dotar al robot de esta funcionalidad básica, existen soluciones más avanzadas y completas para el procesamiento del lenguaje natural, como `Dialogflow` de Google.
-
-Para dotar al robot Kobuki de la capacidad de hablar e interactuar verbalmente con el usuario, implementamos e integramos el nodo `Speak`, parte del paquete `hri_bt_nodes`, dentro de nuestro árbol de comportamiento (BT). Este nodo permite generar respuestas por voz utilizando el sistema de texto a voz (TTS) definido en `audio_common_msgs::action::TTS`.
-
-El nodo Speak extiende la clase `BtActionNode`, especializada en lanzar acciones ROS 2 dentro de un BT. En su constructor se inicializan dos publishers:
-```cpp
-speech_text_publisher_ = node_->create_publisher<std_msgs::msg::String>("speech_text", 10);
-speech_start_publisher_ = node_->create_publisher<std_msgs::msg::Int8>("dialog_phase", 10);
-```
-Estos publishers permiten que el sistema publique el texto que debe pronunciarse, así como una señal para indicar el inicio de la fase de diálogo. La publicación se activa durante el `on_tick`, donde también se procesan los parámetros del texto a pronunciar:
-```cpp
-getInput("speech_text", text);
-getInput("params", sparams);
-text = swap_placeholders(text, params);
-```
-El método `swap_placeholders` reemplaza marcadores en el texto ([] por defecto) con parámetros dinámicos, permitiendo que las frases pronunciadas se adapten al contexto.
-
-Finalmente, el nodo envía el objetivo (goal) con el texto final:
-```cpp
-goal_.text = text;
-```
-Y publica el mensaje correspondiente para activar la reproducción de voz:
-```cpp
-speech_text_publisher_->publish(speech_text_msg_);
-speech_start_publisher_->publish(speech_start_msg_);
-```
-### Integración en el sistema BT
-
-Este nodo fue registrado y cargado dinámicamente a través del archivo `main_hri.cpp`, donde se declara el nodo `hri_node` y se configuran sus transiciones de ciclo de vida (configure y activate). El archivo XML con el árbol de comportamiento se carga desde el parámetro `bt_xml_file`, y los plugins BT (como Speak) se registran dinámicamente:
-```cpp
-factory.registerFromPlugin(loader.getOSName(plugin));
-```
-Esto permite que `Speak` esté disponible como un nodo de acción reutilizable dentro del árbol, y que pueda ser invocado cuando se requiera una interacción verbal por parte del robot.
-
-### Observación
-
-Dentro del paquete de interacción vocal, existen cuatro nodos principales diseñados para la comunicación entre el usuario y el robot: `Speak`, `Listen`, `Query` y `DialogConfirm`. De estos, hemos utilizado únicamente el nodo `Speak`, que permite que el robot hable y emita mensajes de voz hacia el usuario.
-
-Sin embargo, no se integraron los nodos `Listen`, `Query` ni `DialogConfirm` en el árbol de comportamiento final. La razón principal es que el nodo `Listen`, encargado de captar las respuestas del usuario, no se implementó, lo que imposibilitó el uso efectivo de `Query`, que depende de esa entrada para almacenar valores en la *blackboard*, ni de `DialogConfirm`, que requiere la verificación de respuestas verbales del usuario. Dado que la funcionalidad de recepción de voz no estaba operativa, decidimos centrarnos únicamente en la salida de voz del robot, usando `Speak` como única forma de interacción verbal en este proyecto.
-
-## 7. Demostración
+## 6. Demostración
 
 A continuación se presenta un vídeo con la demostración del proyecto *El Escondite*, simulando una partida real. En esta grabación se pueden observar tanto el funcionamiento del sistema como la dinámica del juego en un entorno controlado.
+
+[Juego del escondite con kobuki](https://youtu.be/o68LXmKQM_k)
+
